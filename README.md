@@ -5,9 +5,9 @@ Code repo for final project of ECE 5831
 To setup the python virtual environment conduct the following:
 ```
 #Windows:
-conda env create -f 00_Env\ECE5831_requirements.yml
+conda env create -f 00_Env\ECE5831_requirements.yml --prefix 00_Env\venv
 #Linux: 
-conda env create -f 00_Env/ECE5831_requirements.yml
+conda env create -f 00_Env/ECE5831_requirements.yml --prefix 00_Env/venv
 ```
 
 # Activate Setup
