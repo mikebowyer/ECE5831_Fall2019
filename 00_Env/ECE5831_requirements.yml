@@ -46,5 +46,4 @@ dependencies:
     - termcolor==1.1.0
     - tf-estimator-nightly==1.14.0.dev2019080601
     - werkzeug==0.15.6
-prefix: 00_Env/venv
 
