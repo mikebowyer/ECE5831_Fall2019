@@ -8,8 +8,7 @@
 #notes           :
 #python_version  :Python 3.7.3 
 #==============================================================================
-import logging
-import argparse
+import logging, argparse, os
 import pandas as pd
 import row_transformer as rt
 
@@ -21,7 +20,7 @@ logging.basicConfig(level=logging.DEBUG, filemode='w', format='%(levelname)s:: %
 parser = argparse.ArgumentParser(description='This script converts the Zillow Home Value Index into individual rows to be used for machine learning.')
 parser.add_argument('--input','-i', type=str, required=True,
                     help='The input ZHVI Input data to transform')
-parser.add_argument('--output','-o', default='output_ZHVI_row_transformed.csv',
+parser.add_argument('--output','-o', default='output.csv',
                     help='The output file to store the transformed ZHVI rows')
 parser.add_argument('--first_tranform_row','-ftr', required=True,
                     help='The first row in the ZHVI which will be transformed')
@@ -34,5 +33,14 @@ if __name__ == "__main__":
 
     row_transform = rt.row_transformer(pd.read_csv(args.input),args.first_tranform_row)
     finalDf = row_transform.transform_rows()
+    logging.info("Final Data frame outputis shown below")
+    logging.info(finalDf)
 
-    print(finalDf)
+    outFileName = ""
+    if args.output == 'output.csv':
+        outFileName = os.path.splitext(args.input) + '_transformed.csv'
+    else:
+        outFileName = args.output
+
+    logging.info("Saving output dataframe to " + outFileName)
+    finalDf.to_csv(outFileName, index= None, header=True)

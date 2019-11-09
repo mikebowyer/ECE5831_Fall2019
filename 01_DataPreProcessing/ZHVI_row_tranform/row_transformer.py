@@ -70,7 +70,6 @@ class row_transformer:
                 newRowDf = pd.DataFrame([newRowData],columns=dataFrameHeadings)
                 outputdataframe = outputdataframe.append(newRowDf,ignore_index=True)
 
-        print(outputdataframe.shape)
         return outputdataframe
         
         
