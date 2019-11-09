@@ -11,7 +11,7 @@
 import logging
 import argparse
 import pandas as pd
-import row_transform as rt
+import row_transformer as rt
 
 """ Setup logging config """
 logging.basicConfig(level=logging.DEBUG, filemode='w', format='%(levelname)s:: %(message)s')#,filename='app.log')
@@ -32,4 +32,7 @@ if __name__ == "__main__":
     logging.info('Output tranform file will be saved to ' + str(args.output))
     logging.info('The first row which will be used for transformation is: ' + str(args.first_tranform_row))
 
-    rt.row_transform(pd.read_csv(args.input),args.first_tranform_row)
+    row_transform = rt.row_transformer(pd.read_csv(args.input),args.first_tranform_row)
+    finalDf = row_transform.transform_rows()
+
+    print(finalDf)

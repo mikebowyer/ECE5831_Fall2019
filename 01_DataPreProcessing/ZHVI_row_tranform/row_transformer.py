@@ -10,7 +10,7 @@
 #==============================================================================
 import logging
 import pandas as pd
-class row_transform:
+class row_transformer:
     
     def __init__(self, input_df, start_row):
         """ 
@@ -34,7 +34,6 @@ class row_transform:
         logging.debug('Input Dataframe is of shape ' + str(input_df.shape))
 
         self.check_and_find_start_row_index()
-        self.transform_rows()
 
     def check_and_find_start_row_index(self):
         logging.debug('Checking to ensure input start row exists ' + str(self.start_row))
@@ -48,5 +47,30 @@ class row_transform:
 
     def transform_rows(self):
         logging.info('Starting row transformation using starting row ' + str(self.start_row))
-        pass
+        numCols = len(self.input_df.columns)
+        allHeadings = list(self.input_df.columns.values)
+        dataFrameHeadings =  allHeadings[:self.start_row_ind]
+        dataFrameHeadings.append("Year-Month")
+        dataFrameHeadings.append("ZHVI")
+        
+        outputdataframe = pd.DataFrame(columns=dataFrameHeadings)
+        inputDfColNames = list(self.input_df.columns)
+
+        for index, row in self.input_df.iterrows():
+            newRowsInitialCols = []
+            logging.debug("Processing row " + str(index) + "/" + str(self.input_df.shape[0]))
+
+            for column in range(0,self.start_row_ind):
+                newRowsInitialCols.append(row[column])        
+
+            for column in range(self.start_row_ind,numCols):
+                newRowData = newRowsInitialCols.copy()
+                newRowData.append(inputDfColNames[column])
+                newRowData.append(row[column])
+                newRowDf = pd.DataFrame([newRowData],columns=dataFrameHeadings)
+                outputdataframe = outputdataframe.append(newRowDf,ignore_index=True)
+
+        print(outputdataframe.shape)
+        return outputdataframe
+        
         
