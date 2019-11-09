@@ -19,15 +19,17 @@ logging.basicConfig(level=logging.DEBUG, filemode='w', format='%(levelname)s:: %
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(description='This script converts the Zillow Home Value Index into individual rows to be used for machine learning.')
-parser.add_argument('--input','-i', type=str,
+parser.add_argument('--input','-i', type=str, required=True,
                     help='The input ZHVI Input data to transform')
 parser.add_argument('--output','-o', default='output_ZHVI_row_transformed.csv',
                     help='The output file to store the transformed ZHVI rows')
-
+parser.add_argument('--first_tranform_row','-ftr', required=True,
+                    help='The first row in the ZHVI which will be transformed')
 
 if __name__ == "__main__":
     args = parser.parse_args()
     logging.info('Using input file ' + str(args.input))
     logging.info('Output tranform file will be saved to ' + str(args.output))
+    logging.info('The first row which will be used for transformation is: ' + str(args.first_tranform_row))
 
-    rt.row_transform(pd.read_csv(args.input))
+    rt.row_transform(pd.read_csv(args.input),args.first_tranform_row)
