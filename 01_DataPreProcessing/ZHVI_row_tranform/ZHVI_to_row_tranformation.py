@@ -10,6 +10,7 @@
 #==============================================================================
 import logging
 import argparse
+import pandas as pd
 
 """ Setup logging config """
 logging.basicConfig(level=logging.DEBUG, filemode='w', format='%(levelname)s:: %(message)s')#,filename='app.log')
@@ -27,3 +28,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     logging.info('Using input file ' + str(args.input))
     logging.info('Output tranform file will be saved to ' + str(args.output))
+
+    pd.read_csv(args.input) 
