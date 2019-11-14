@@ -10,8 +10,7 @@
             "request": "launch",
             "program": "${workspaceFolder}\\01_DataPreProcessing\\ZHVI_row_tranform\\ZHVI_to_row_tranformation.py",
             "console": "integratedTerminal",
-            "args":["-i","${workspaceFolder}\\datasets\\Neighborhood_Zhvi_AllHomes_subset.csv",
-                "-o","Neighborhood_Zhvi_AllHomes_transformed.csv",
+            "args":["-i","${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
                 "-ftr", "1996-04"]
         }
     ]

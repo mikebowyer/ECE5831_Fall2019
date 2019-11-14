@@ -38,7 +38,7 @@ if __name__ == "__main__":
 
     outFileName = ""
     if args.output == 'output.csv':
-        outFileName = os.path.splitext(args.input) + '_transformed.csv'
+        outFileName = os.path.splitext(args.input)[0] + '_transformed.csv'
     else:
         outFileName = args.output
 
