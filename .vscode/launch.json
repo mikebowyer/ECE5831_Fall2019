@@ -1,0 +1,17 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "ZHVI Row Transform",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\01_DataPreProcessing\\ZHVI_row_tranform\\ZHVI_to_row_tranformation.py",
+            "console": "integratedTerminal",
+            "args":["-i","${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
+                "-ftr", "1996-04"]
+        }
+    ]
+}
