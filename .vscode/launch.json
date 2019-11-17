@@ -12,7 +12,7 @@
             "console": "integratedTerminal",
             "args": [
                 "-ic",
-                "${workspaceFolder}\\datasets\\ChicagoTrimmedCrimeData.csv",
+                "${workspaceFolder}\\datasets\\ChicagoTrimmedCrimeData_subset.csv",
                 "-is",
                 "${workspaceFolder}\\01_DataPreProcessing\\Crime_GPS_to_Zillow_Neighborhood\\zillow-neighborhoods.shp"
             ]

@@ -46,8 +46,10 @@ if __name__ == "__main__":
     r = shapefile.Reader(args.input_shapes)
     shapes = r.shapes()
 
-    gps2zh.GPStoZNeighborhood(pd.read_csv(args.input_crime), shapes)
+    neihgborhoodFinder = gps2zh.GPStoZNeighborhood(
+        pd.read_csv(args.input_crime), shapes)
 
+    neihgborhoodFinder.add_zillow_neighborhood_column()
     # row_transform = rt.row_transformer(
     #     pd.read_csv(args.input), args.first_tranform_row)
     # finalDf = row_transform.transform_rows()

@@ -8,25 +8,30 @@
 # python_version  :Python 3.7.3
 # ==============================================================================
 import logging
+import shapefile
+from multiprocessing import Pool
 import pandas as pd
+import numpy as np
 
 
 class GPStoZNeighborhood:
 
     def __init__(self, input_crime_df, input_zillow_neighborhood_shapes):
-        """ 
+        """
         Saves input crime dataframe and ensures there is lat and long in it.
         Saves the input neighborhood shapes locally.
 
-        Parameters: 
+        Parameters:
         input_crime_df (pandas dataframe): Raw input crime data frame with lat and log columns
         input_zillow_neighborhood_shapes (shapes): shapes of all zillow neighborhoods
 
-        Returns: 
+        Returns:
         Pandas dataframe: The input crime dataframe with an added column titled "ZillowNeighborhood"
         """
         if isinstance(input_crime_df, pd.DataFrame):
             self.crime_df = input_crime_df
+            logging.debug('Input Dataframe is of shape ' +
+                          str(input_crime_df.shape))
         else:
             logging.error(
                 "The input_df argument is not a pandas dataframe.")
@@ -36,6 +41,10 @@ class GPStoZNeighborhood:
             logging.error(
                 "The input_df does not contain columns titled Lat and Long.")
             exit - 1
+
+        self.nhShapes = input_zillow_neighborhood_shapes
+        logging.debug('Input amount of neighborhood shapes is ' +
+                      str(len(input_zillow_neighborhood_shapes)))
 
     def check_lat_long_exist(self):
         logging.debug(
@@ -49,3 +58,40 @@ class GPStoZNeighborhood:
             return True
         else:
             return False
+
+    def find_zillow_neighborhood(self, input_row):
+        # data = np.array(input_row)
+        # input_row_series = pd.Series(data)
+        # print(type(input_row_series))
+        # input_row_new = input_row_series
+        # input_row_new["ZillowNeighborhood"] = 2
+        inlist = list(input_row[1])
+        inlist.append(2)
+        return inlist
+
+    def add_zillow_neighborhood_column(self):
+
+        dataFrameHeadings = list(self.crime_df.columns.values)
+        dataFrameHeadings.append("ZillowNeighborhood")
+
+        logging.info('Begging to append zillow neighborhood values.')
+        p = Pool()
+        results = p.map(self.find_zillow_neighborhood,
+                        self.crime_df.iterrows())
+        p.close()
+        p.join()
+
+        outputdataframe = pd.DataFrame(columns=dataFrameHeadings)
+
+        for result in results:
+            newRowDf = pd.DataFrame([result], columns=dataFrameHeadings)
+            outputdataframe = outputdataframe.append(
+                newRowDf, ignore_index=True)
+
+        print(outputdataframe.head)
+
+        """THIS IS TO DEBUG THE FOR LOOP FUNCTION"""
+        # output = self.find_zillow_neighborhood(
+        #     next(self.crime_df.iterrows())[1])
+        # print(output)
+        # print("This")
