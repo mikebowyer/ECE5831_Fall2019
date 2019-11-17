@@ -13,11 +13,13 @@ from multiprocessing import Pool
 from shapely.geometry import shape, Point
 import pandas as pd
 import numpy as np
+import sys
+# sys.setrecursionlimit(10000)
 
 
 class GPStoZNeighborhood:
 
-    def __init__(self, input_crime_df, input_zillow_neighborhood_shapes):
+    def __init__(self, input_crime_df, input_zillow_neighborhood_shapes, input_zillow_neighborhood_encodings):
         """
         Saves input crime dataframe and ensures there is lat and long in it.
         Saves the input neighborhood shapes locally.
@@ -44,6 +46,8 @@ class GPStoZNeighborhood:
             exit - 1
 
         self.nhShapes = input_zillow_neighborhood_shapes
+        self.nhEncodings = [
+            item.name for item in input_zillow_neighborhood_encodings]
         logging.debug('Input amount of neighborhood shapes is ' +
                       str(len(input_zillow_neighborhood_shapes)))
         polygons = []
@@ -72,14 +76,14 @@ class GPStoZNeighborhood:
 
         point = Point(longi, lati)
         count = 0
-        polyIndex = 0
+        polyIndex = -1
         for idx, polygon in enumerate(self.nhPolygons):
             if polygon.contains(point):
                 count = count + 1
                 polyIndex = idx
         inlist = list(input_row[1])
         inlist.append(count)
-        inlist.append(polyIndex)
+        inlist.append(self.nhEncodings[polyIndex])
         return inlist
 
     def add_zillow_neighborhood_column(self):

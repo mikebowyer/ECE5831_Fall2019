@@ -48,7 +48,7 @@ if __name__ == "__main__":
     encodings = r.records()
 
     neihgborhoodFinder = gps2zh.GPStoZNeighborhood(
-        pd.read_csv(args.input_crime), shapes)
+        pd.read_csv(args.input_crime), shapes, encodings)
 
     inputCrimeWZillowNH = neihgborhoodFinder.add_zillow_neighborhood_column()
     # row_transform = rt.row_transformer(
