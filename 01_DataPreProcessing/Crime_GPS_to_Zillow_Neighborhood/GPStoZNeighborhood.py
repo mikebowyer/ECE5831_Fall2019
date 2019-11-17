@@ -10,6 +10,7 @@
 import logging
 import shapefile
 from multiprocessing import Pool
+from shapely.geometry import shape, Point
 import pandas as pd
 import numpy as np
 
@@ -45,6 +46,11 @@ class GPStoZNeighborhood:
         self.nhShapes = input_zillow_neighborhood_shapes
         logging.debug('Input amount of neighborhood shapes is ' +
                       str(len(input_zillow_neighborhood_shapes)))
+        polygons = []
+        for nhShape in self.nhShapes:
+            polygon = shape(nhShape)
+            polygons.append(polygon)
+        self.nhPolygons = polygons
 
     def check_lat_long_exist(self):
         logging.debug(
@@ -60,13 +66,17 @@ class GPStoZNeighborhood:
             return False
 
     def find_zillow_neighborhood(self, input_row):
-        # data = np.array(input_row)
-        # input_row_series = pd.Series(data)
-        # print(type(input_row_series))
-        # input_row_new = input_row_series
-        # input_row_new["ZillowNeighborhood"] = 2
+        d = dict(input_row[1])
+        lati = d['Latitude']
+        longi = d['Longitude']
+
+        point = Point(longi, lati)
+        count = 0
+        for polygon in self.nhPolygons:
+            if polygon.contains(point):
+                count = count + 1
         inlist = list(input_row[1])
-        inlist.append(2)
+        inlist.append(count)
         return inlist
 
     def add_zillow_neighborhood_column(self):
@@ -90,8 +100,4 @@ class GPStoZNeighborhood:
 
         print(outputdataframe.head)
 
-        """THIS IS TO DEBUG THE FOR LOOP FUNCTION"""
-        # output = self.find_zillow_neighborhood(
-        #     next(self.crime_df.iterrows())[1])
-        # print(output)
-        # print("This")
+        return outputdataframe

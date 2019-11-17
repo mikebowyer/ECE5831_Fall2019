@@ -45,11 +45,12 @@ if __name__ == "__main__":
 
     r = shapefile.Reader(args.input_shapes)
     shapes = r.shapes()
+    encodings = r.records()
 
     neihgborhoodFinder = gps2zh.GPStoZNeighborhood(
         pd.read_csv(args.input_crime), shapes)
 
-    neihgborhoodFinder.add_zillow_neighborhood_column()
+    inputCrimeWZillowNH = neihgborhoodFinder.add_zillow_neighborhood_column()
     # row_transform = rt.row_transformer(
     #     pd.read_csv(args.input), args.first_tranform_row)
     # finalDf = row_transform.transform_rows()
@@ -57,4 +58,4 @@ if __name__ == "__main__":
     # logging.info(finalDf)
 
     logging.info("Saving output dataframe to " + outFileName)
-    # finalDf.to_csv(outFileName, index=None, header=True)
+    inputCrimeWZillowNH.to_csv(outFileName, index=None, header=True)
