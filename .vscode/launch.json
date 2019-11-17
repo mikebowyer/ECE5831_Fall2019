@@ -5,13 +5,30 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Crime GPS to Zillow Neighborhood",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\01_DataPreProcessing\\Crime_GPS_to_Zillow_Neighborhood\\Crime_GPS_to_Zillow_Neighborhood.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-ic",
+                "${workspaceFolder}\\datasets\\ChicagoTrimmedCrimeData.csv",
+                "-is",
+                "${workspaceFolder}\\01_DataPreProcessing\\Crime_GPS_to_Zillow_Neighborhood\\zillow-neighborhoods.shp"
+            ]
+        },
+        {
             "name": "ZHVI Row Transform",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}\\01_DataPreProcessing\\ZHVI_row_tranform\\ZHVI_to_row_tranformation.py",
             "console": "integratedTerminal",
-            "args":["-i","${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
-                "-ftr", "1996-04"]
+            "args": [
+                "-i",
+                "${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
+                "-ftr",
+                "1996-04"
+            ]
         }
     ]
 }
