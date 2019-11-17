@@ -72,16 +72,20 @@ class GPStoZNeighborhood:
 
         point = Point(longi, lati)
         count = 0
-        for polygon in self.nhPolygons:
+        polyIndex = 0
+        for idx, polygon in enumerate(self.nhPolygons):
             if polygon.contains(point):
                 count = count + 1
+                polyIndex = idx
         inlist = list(input_row[1])
         inlist.append(count)
+        inlist.append(polyIndex)
         return inlist
 
     def add_zillow_neighborhood_column(self):
 
         dataFrameHeadings = list(self.crime_df.columns.values)
+        dataFrameHeadings.append("NumMatchedNeidhborhoods")
         dataFrameHeadings.append("ZillowNeighborhood")
 
         logging.info('Begging to append zillow neighborhood values.')
