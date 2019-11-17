@@ -13,6 +13,7 @@ import shapefile
 import argparse
 import os
 import pandas as pd
+import GPStoZNeighborhood as gps2zh
 
 """ Setup logging config """
 logging.basicConfig(level=logging.DEBUG, filemode='w',
@@ -43,6 +44,9 @@ if __name__ == "__main__":
     logging.info('Output tranform file will be saved to ' + str(outFileName))
 
     r = shapefile.Reader(args.input_shapes)
+    shapes = r.shapes()
+
+    gps2zh.GPStoZNeighborhood(pd.read_csv(args.input_crime), shapes)
 
     # row_transform = rt.row_transformer(
     #     pd.read_csv(args.input), args.first_tranform_row)
