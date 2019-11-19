@@ -13,6 +13,7 @@ from multiprocessing import Pool
 from shapely.geometry import shape, Point
 import pandas as pd
 import numpy as np
+import tqdm
 import sys
 # sys.setrecursionlimit(10000)
 
@@ -81,10 +82,11 @@ class GPStoZNeighborhood:
             if polygon.contains(point):
                 count = count + 1
                 polyIndex = idx
-        inlist = list(input_row[1])
-        inlist.append(count)
-        inlist.append(self.nhEncodings[polyIndex])
-        return inlist
+                # break
+        output_row_list = list(input_row[1])
+        output_row_list.append(count)
+        output_row_list.append(self.nhEncodings[polyIndex])
+        return output_row_list
 
     def add_zillow_neighborhood_column(self):
 
@@ -93,13 +95,26 @@ class GPStoZNeighborhood:
         dataFrameHeadings.append("ZillowNeighborhood")
 
         logging.info('Begging to append zillow neighborhood values.')
-        p = Pool()
-        results = p.map(self.find_zillow_neighborhood,
-                        self.crime_df.iterrows())
-        p.close()
-        p.join()
+        p = Pool(8)
+        results = []
+        rows, cols = self.crime_df.shape
+        for _ in tqdm.tqdm(p.imap_unordered(self.find_zillow_neighborhood, self.crime_df.iterrows(), chunksize=1000), total=rows):
+            pass
+            results.append(_)
 
+        # results = p.imap_unordered(self.find_zillow_neighborhood,
+        #                            self.crime_df.iterrows(), chunksize=100)
+        # p.close()
+        # p.join()
+
+        #
         outputdataframe = pd.DataFrame(columns=dataFrameHeadings)
+        # for index, row in self.crime_df.iterrows():
+        #     logging.debug(str(index) + "/" + str(rows))
+        #     newRowDf = pd.DataFrame(
+        #         [self.find_zillow_neighborhood(row)], columns=dataFrameHeadings)
+        #     outputdataframe = outputdataframe.append(
+        #         newRowDf, ignore_index=True)
 
         for result in results:
             newRowDf = pd.DataFrame([result], columns=dataFrameHeadings)
