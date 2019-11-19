@@ -46,6 +46,7 @@ class GPStoZNeighborhood:
                 "The input_df does not contain columns titled Lat and Long.")
             exit - 1
 
+        """Initialize and save all zillow neighborhood shapes and encodings"""
         self.nhShapes = input_zillow_neighborhood_shapes
         self.nhEncodings = [
             item.name for item in input_zillow_neighborhood_encodings]
@@ -58,6 +59,15 @@ class GPStoZNeighborhood:
         self.nhPolygons = polygons
 
     def check_lat_long_exist(self):
+        """
+        Ensures that latitude and longitude columns exist in input crime dataset
+
+        Parameters:
+
+        Returns:
+            True: When both latitude and longitude columns exist
+            False: Otherwise
+        """
         logging.debug(
             'Checking to ensure lat and long rows exist.')
 
@@ -71,6 +81,15 @@ class GPStoZNeighborhood:
             return False
 
     def find_zillow_neighborhood(self, input_row):
+        """
+        Finds the associated zillow neighborhoods for the input rows latitude and longitudue.
+
+        Parameters:
+            input_row: Row from the crime data set. Contains 1 individual crime information.
+
+        Returns:
+            output_row_list: The input row with the NumMatchedNeidhborhoods and ZillowNeighborhood columns populated.
+        """
         d = dict(input_row[1])
         lati = d['Latitude']
         longi = d['Longitude']
@@ -83,13 +102,20 @@ class GPStoZNeighborhood:
                 count = count + 1
                 polyIndex = idx
                 # break
+
+        """Append new columns to input list"""
         output_row_list = list(input_row[1])
         output_row_list.append(count)
         output_row_list.append(self.nhEncodings[polyIndex])
         return output_row_list
 
     def add_zillow_neighborhood_column(self):
+        """
+        Returns original crime data frame with appended NumMatchedNeidhborhoods and ZillowNeighborhood columns.
 
+        Returns:
+            Pandas data frame: The original crime dataframe with the NumMatchedNeidhborhoods and ZillowNeighborhood columns populated.
+        """
         dataFrameHeadings = list(self.crime_df.columns.values)
         dataFrameHeadings.append("NumMatchedNeidhborhoods")
         dataFrameHeadings.append("ZillowNeighborhood")
