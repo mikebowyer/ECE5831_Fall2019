@@ -43,19 +43,17 @@ if __name__ == "__main__":
         outFileName = args.output
     logging.info('Output tranform file will be saved to ' + str(outFileName))
 
+    """ Read in the shapes defined in the Zillow Neighborhood shape file """
     r = shapefile.Reader(args.input_shapes)
     shapes = r.shapes()
     encodings = r.records()
 
+    """ Create class instance for GPS to Zillow neighborhood to store shapes and crime data """
     neihgborhoodFinder = gps2zh.GPStoZNeighborhood(
         pd.read_csv(args.input_crime), shapes, encodings)
 
+    """ Call the function which will find the zillow neighbor hood for each crime data """
     inputCrimeWZillowNH = neihgborhoodFinder.add_zillow_neighborhood_column()
-    # row_transform = rt.row_transformer(
-    #     pd.read_csv(args.input), args.first_tranform_row)
-    # finalDf = row_transform.transform_rows()
-    # logging.info("Final Data frame outputis shown below")
-    # logging.info(finalDf)
 
     logging.info("Saving output dataframe to " + outFileName)
     inputCrimeWZillowNH.to_csv(outFileName, index=None, header=True)

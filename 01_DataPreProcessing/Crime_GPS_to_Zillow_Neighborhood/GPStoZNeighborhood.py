@@ -15,7 +15,6 @@ import pandas as pd
 import numpy as np
 import tqdm
 import sys
-# sys.setrecursionlimit(10000)
 
 
 class GPStoZNeighborhood:
@@ -90,7 +89,8 @@ class GPStoZNeighborhood:
         Returns:
             output_row_list: The input row with the NumMatchedNeidhborhoods and ZillowNeighborhood columns populated.
         """
-        d = dict(input_row[1])
+        d = dict(
+            input_row[1])  # First element of input row is the index of the input row, row 1 is the actually row data
         lati = d['Latitude']
         longi = d['Longitude']
 
@@ -101,7 +101,6 @@ class GPStoZNeighborhood:
             if polygon.contains(point):
                 count = count + 1
                 polyIndex = idx
-                # break
 
         """Append new columns to input list"""
         output_row_list = list(input_row[1])
@@ -121,32 +120,16 @@ class GPStoZNeighborhood:
         dataFrameHeadings.append("ZillowNeighborhood")
 
         logging.info('Begging to append zillow neighborhood values.')
-        p = Pool(8)
+        p = Pool()
         results = []
         rows, cols = self.crime_df.shape
-        for _ in tqdm.tqdm(p.imap_unordered(self.find_zillow_neighborhood, self.crime_df.iterrows(), chunksize=1000), total=rows):
+
+        """ multiprocess each row in the input crime dataset """
+        for _ in tqdm.tqdm(p.imap_unordered(self.find_zillow_neighborhood, self.crime_df.iterrows(), chunksize=10000), total=rows):
             pass
             results.append(_)
 
-        # results = p.imap_unordered(self.find_zillow_neighborhood,
-        #                            self.crime_df.iterrows(), chunksize=100)
-        # p.close()
-        # p.join()
-
-        #
-        outputdataframe = pd.DataFrame(columns=dataFrameHeadings)
-        # for index, row in self.crime_df.iterrows():
-        #     logging.debug(str(index) + "/" + str(rows))
-        #     newRowDf = pd.DataFrame(
-        #         [self.find_zillow_neighborhood(row)], columns=dataFrameHeadings)
-        #     outputdataframe = outputdataframe.append(
-        #         newRowDf, ignore_index=True)
-
-        for result in results:
-            newRowDf = pd.DataFrame([result], columns=dataFrameHeadings)
-            outputdataframe = outputdataframe.append(
-                newRowDf, ignore_index=True)
-
-        print(outputdataframe.head)
+        logging.info('Converting output results list into dataframe.')
+        outputdataframe = pd.DataFrame(results, columns=dataFrameHeadings)
 
         return outputdataframe
