@@ -1,5 +1,7 @@
 import logging
 import pandas as pd
+from multiprocessing import Pool
+import tqdm
 
 
 class PastFutureDataGenerator:
@@ -45,7 +47,23 @@ class PastFutureDataGenerator:
         self.housingHeadings = headings_housing
         self.housingCrimeHeadings = headings_housingCrime
 
+    def neighborhood_get_past_future_data(self, neighborhood):
+        output = []
+        return output
+
     def generate_past_future_data(self):
+        neighborhoods = list(self.inputDf['ZillowNeighborhood'].unique())
+        logging.info(
+            "Starting to generate past and future data now based on neighbor hoods.")
+        logging.debug(
+            "Working on a total of " + str(len(neighborhoods)) + " neighborhoods!")
+
+        p = Pool()
+        results = []
+        for _ in tqdm.tqdm(p.imap_unordered(self.neighborhood_get_past_future_data, iter(neighborhoods), chunksize=10), total=len(neighborhoods)):
+            results.append(_)
+            pass
+
         housingDf = pd.DataFrame()
         housingCrimeDf = pd.DataFrame()
         return housingDf, housingCrimeDf
