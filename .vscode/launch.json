@@ -31,6 +31,21 @@
                 "-o",
                 "ChicagoTrimmedHousingData_transformed_2001AndBeyond.csv"
             ]
+        },
+        {
+            "name": "DNN_Data_Creator",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\01_DataPreProcessing\\PastFutureDataCombinerForDNN\\PastMonthsToTrain_FutureZHVITarget_Generator.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "${workspaceFolder}\\datasets\\trainingData1_subset.csv",
+                "-pm",
+                "4",
+                "-fm",
+                "2"
+            ]
         }
     ]
 }
