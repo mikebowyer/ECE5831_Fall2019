@@ -27,7 +27,9 @@
                 "-i",
                 "${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
                 "-ftr",
-                "1996-04"
+                "2001-01",
+                "-o",
+                "ChicagoTrimmedHousingData_transformed_2001AndBeyond.csv"
             ]
         }
     ]
