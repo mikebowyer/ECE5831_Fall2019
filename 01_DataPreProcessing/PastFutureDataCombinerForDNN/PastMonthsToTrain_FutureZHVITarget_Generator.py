@@ -12,11 +12,12 @@ import logging
 import argparse
 import os
 import pandas as pd
+import PastFutureDataGenerator as pfdg
 
 """ Setup logging config """
 logging.basicConfig(level=logging.DEBUG, filemode='w',
                     format='%(levelname)s:: %(message)s')  # ,filename='app.log')
-#logging.debug('This is a debug message')
+# logging.debug('This is a debug message')
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
@@ -31,6 +32,7 @@ parser.add_argument('--future_months', '-fm', required=True,
                     help='How many months in the future to predict (1=Only predict current month, and no future months)')
 
 if __name__ == "__main__":
+    """ Parse Args """
     args = parser.parse_args()
     logging.info('Using input file ' + str(args.input))
     logging.info('Output tranform file will be saved to ' + str(args.output))
@@ -38,9 +40,15 @@ if __name__ == "__main__":
                  str(args.prev_months) + ' months of  worth of data, and will contain ZHVI values of the current month and ' +
                  str(int(args.future_months)-1) + ' months in the future.')
 
-    # row_transform = rt.row_transformer(
-    #     pd.read_csv(args.input), args.first_tranform_row)
-    # finalDf = row_transform.transform_rows()
+    """ Create input Df and drop date column """
+    inputDf = pd.read_csv(args.input)
+    inputDf = inputDf.drop(axis=1, columns=['Date'])
+
+    """ Generate new data """
+    dataGenerator = pfdg.PastFutureDataGenerator(
+        inputDf, args.prev_months, args.future_months)
+    dataGenerator.create_output_headings()
+    dataGenerator.generate_past_future_data()
     # logging.info("Final Data frame outputis shown below")
     # logging.info(finalDf)
 
