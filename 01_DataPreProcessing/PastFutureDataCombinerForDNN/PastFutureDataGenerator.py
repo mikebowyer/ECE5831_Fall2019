@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 from multiprocessing import Pool
 import tqdm
+import itertools
 
 
 class PastFutureDataGenerator:
@@ -20,7 +21,7 @@ class PastFutureDataGenerator:
 
         for i in range(0, self.prev_months):
             # print("i = " + str(i))
-            """ Create new headings for ZHVICrime Data """
+            """ Create new headings for housingCrime Data """
             tempHeadings = []
             timeStep = '_t-' + str(i+1)  # create time step string
             # for each feature name add times step value to it
@@ -48,8 +49,35 @@ class PastFutureDataGenerator:
         self.housingCrimeHeadings = headings_housingCrime
 
     def neighborhood_get_past_future_data(self, neighborhood):
-        output = []
-        return output
+        neighborhoodDf = self.inputDf[self.inputDf['ZillowNeighborhood']
+                                      == neighborhood]
+        rows = neighborhoodDf.shape[0]
+
+        housingCrime = []
+        housing = []
+        for index, row in itertools.islice(neighborhoodDf.iterrows(), self.prev_months, (rows-self.future_months)):
+            # print(row['Date'])
+            # print(index)
+            newrowhousingCrime = []
+            newrowHousing = []
+            """ Add past data to new row """
+            for i in range(0, self.prev_months):
+                newrowhousingCrime = newrowhousingCrime + \
+                    list(neighborhoodDf.loc[index-i].values)
+                newrowHousing = newrowHousing + \
+                    [neighborhoodDf['ZHVI'].loc[index-i]]
+
+            """ Add target data to new row """
+            for j in range(0, self.future_months):
+                newrowhousingCrime = newrowhousingCrime + \
+                    [neighborhoodDf['ZHVI'].loc[index+j]]
+                newrowHousing = newrowHousing + \
+                    [neighborhoodDf['ZHVI'].loc[index+j]]
+
+            housingCrime.append(newrowhousingCrime)
+            housing.append(newrowHousing)
+
+        return housingCrime, housing
 
     def generate_past_future_data(self):
         neighborhoods = list(self.inputDf['ZillowNeighborhood'].unique())
@@ -64,6 +92,27 @@ class PastFutureDataGenerator:
             results.append(_)
             pass
 
-        housingDf = pd.DataFrame()
-        housingCrimeDf = pd.DataFrame()
-        return housingDf, housingCrimeDf
+        logging.info("Finished generating past and future data!")
+
+        """ Compress output into two data frames """
+        logging.info(
+            "Now concatanating output results and creating output dataframes.")
+        housingCrime = [result[0] for result in results]
+        housingCrime = list(itertools.chain.from_iterable(housingCrime))
+
+        housing = [result[1] for result in results]
+        housing = list(itertools.chain.from_iterable(housing))
+
+        # , self.housingCrimeHeadings)
+        housingCrimeDf = pd.DataFrame(housingCrime)
+        housingCrimeDf.columns = self.housingCrimeHeadings
+
+        housingDf = pd.DataFrame(housing)
+        housingDf.columns = self.housingHeadings
+
+        logging.info(
+            "Final data set with crime and housing info is of size: " + str(housingCrimeDf.shape))
+        logging.info(
+            "Final data set with housing only info is of size: " + str(housingDf.shape))
+
+        return housingCrimeDf, housingDf

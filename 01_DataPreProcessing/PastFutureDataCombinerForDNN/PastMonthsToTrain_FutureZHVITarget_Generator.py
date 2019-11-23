@@ -35,7 +35,7 @@ if __name__ == "__main__":
     """ Parse Args """
     args = parser.parse_args()
     logging.info('Using input file ' + str(args.input))
-    logging.info('Output tranform file will be saved to ' + str(args.output))
+    logging.info('Output files will be saved with name ' + str(args.output))
     logging.info('Each row in the output file will contain ' +
                  str(args.prev_months) + ' months of  worth of data, and will contain ZHVI values of the current month and ' +
                  str(int(args.future_months)-1) + ' months in the future.')
@@ -48,15 +48,26 @@ if __name__ == "__main__":
     dataGenerator = pfdg.PastFutureDataGenerator(
         inputDf, args.prev_months, args.future_months)
     dataGenerator.create_output_headings()
-    dataGenerator.generate_past_future_data()
-    # logging.info("Final Data frame outputis shown below")
-    # logging.info(finalDf)
+    housingCrimeDf, housingDf = dataGenerator.generate_past_future_data()
 
-    outFileName = ""
+    """ Determine output file names """
+    outHousingCrimeFileName = ""
+    outHousingFileName = ""
     if args.output == 'output.csv':
-        outFileName = os.path.splitext(args.input)[0] + '_transformed.csv'
-    else:
-        outFileName = args.output
+        outHousingCrimeFileName = os.path.splitext(
+            args.input)[0] + '_housingCrime_' + args.prev_months + 'Prev_' + args.future_months + 'Future_Months.csv'
+        outHousingFileName = os.path.splitext(
+            args.input)[0] + '_housing_' + args.prev_months + 'Prev_' + args.future_months + 'Future_Months.csv'
 
-    logging.info("Saving output dataframe to " + outFileName)
-    # finalDf.to_csv(outFileName, index=None, header=True)
+    else:
+        outHousingCrimeFileName = args.output + '_housingCrime_' + \
+            args.prev_months + 'Prev_' + args.future_months + 'Future_Months.csv'
+        outHousingFileName = args.output + '_housing_' + args.prev_months + \
+            'Prev_' + args.future_months + 'Future_Months.csv'
+
+    logging.info("Saving housing and crime data to " + outHousingCrimeFileName)
+    logging.info("Saving housing data to " + outHousingFileName)
+
+    """ Save output files """
+    housingCrimeDf.to_csv(outHousingCrimeFileName, index=None, header=True)
+    housingDf.to_csv(outHousingFileName, index=None, header=True)
