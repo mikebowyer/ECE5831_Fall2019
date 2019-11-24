@@ -9,6 +9,7 @@
 # python_version  :Python 3.7.3
 # ==============================================================================
 import logging
+import math
 import argparse
 import os
 import pandas as pd
@@ -74,7 +75,12 @@ if __name__ == "__main__":
     myModel = Sequential()
     myModel.add(Dense(trainingDf.shape[1], kernel_initializer='normal',
                       input_dim=trainingDf.shape[1], activation='relu'))
-    myModel.add(Dense(2, kernel_initializer='normal', activation='linear'))
+    myModel.add(
+        Dense(math.ceil(trainingDf.shape[1]/2), kernel_initializer='normal', activation='relu'))
+    myModel.add(
+        Dense(math.ceil(trainingDf.shape[1]/4), kernel_initializer='normal', activation='relu'))
+    myModel.add(
+        Dense(2, kernel_initializer='normal', activation='linear'))
     myModel.compile(loss='mean_absolute_error', optimizer='adam',
                     metrics=['mean_absolute_error'])
     myModel.summary()
@@ -90,3 +96,10 @@ if __name__ == "__main__":
                 validation_split=0.2, callbacks=callbacks_list)
 
     """ Reload model """
+    weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
+    myModel.load_weights(weights_file)  # load it
+    myModel.compile(loss='mean_absolute_error',
+                    optimizer='adam', metrics=['mean_absolute_error'])
+
+    predictions = myModel.predict(trainingDf)
+    print(predictions)
