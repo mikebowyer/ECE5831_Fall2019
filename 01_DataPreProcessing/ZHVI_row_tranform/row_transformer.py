@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-#title           :row_transform.py
+# title           :row_transform.py
 # description     :This script converts the Zillow Home Value Index into individual rows to be used for machine learning.
-# author          :Michael Bowuer
-#date            :20191109
-#version         :0.0
+# author          :Michael Bowyer
+# date            :20191109
+# version         :0.0
 # usage           :python ZHVI_to_row_tranformation.py -i input.csv -o output.csv
 # notes           :
 # python_version  :Python 3.7.3

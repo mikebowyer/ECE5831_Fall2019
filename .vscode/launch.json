@@ -27,7 +27,24 @@
                 "-i",
                 "${workspaceFolder}\\datasets\\ChicagoTrimmedHousingData.csv",
                 "-ftr",
-                "1996-04"
+                "2001-01",
+                "-o",
+                "ChicagoTrimmedHousingData_transformed_2001AndBeyond.csv"
+            ]
+        },
+        {
+            "name": "DNN_Data_Creator",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\01_DataPreProcessing\\PastFutureDataCombinerForDNN\\PastMonthsToTrain_FutureZHVITarget_Generator.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
+                "-pm",
+                "6",
+                "-fm",
+                "3"
             ]
         }
     ]
