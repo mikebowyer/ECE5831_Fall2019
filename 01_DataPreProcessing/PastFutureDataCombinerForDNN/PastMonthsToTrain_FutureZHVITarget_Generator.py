@@ -42,7 +42,6 @@ if __name__ == "__main__":
 
     """ Create input Df and drop date column """
     inputDf = pd.read_csv(args.input)
-    inputDf = inputDf.drop(axis=1, columns=['Date'])
 
     """ Generate new data """
     dataGenerator = pfdg.PastFutureDataGenerator(

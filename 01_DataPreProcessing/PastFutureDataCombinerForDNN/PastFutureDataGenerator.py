@@ -14,8 +14,10 @@ class PastFutureDataGenerator:
 
     def create_output_headings(self):
         allHeadings = list(self.inputDf.columns.values)
-        headings_housingCrime = []
-        headings_housing = []
+        allHeadings.remove('Date')
+        allHeadings.remove('ZillowNeighborhood')
+        headings_housingCrime = ['Date', 'ZillowNeighborhood']
+        headings_housing = ['Date', 'ZillowNeighborhood']
         print(len(allHeadings))
         logging.info("Creating input headings now.")
 
@@ -51,15 +53,19 @@ class PastFutureDataGenerator:
     def neighborhood_get_past_future_data(self, neighborhood):
         neighborhoodDf = self.inputDf[self.inputDf['ZillowNeighborhood']
                                       == neighborhood]
+
+        dates = neighborhoodDf['Date']
+        neighborhoodDf = neighborhoodDf.drop(
+            axis=1, columns=['ZillowNeighborhood', 'Date'])
         rows = neighborhoodDf.shape[0]
 
         housingCrime = []
         housing = []
-        for index, row in itertools.islice(neighborhoodDf.iterrows(), self.prev_months, (rows-self.future_months)):
+        for index, row in itertools.islice(neighborhoodDf.iterrows(), self.prev_months-1, (rows-self.future_months)):
             # print(row['Date'])
             # print(index)
-            newrowhousingCrime = []
-            newrowHousing = []
+            newrowhousingCrime = [dates.loc[index], neighborhood]
+            newrowHousing = [dates.loc[index], neighborhood]
             """ Add past data to new row """
             for i in range(0, self.prev_months):
                 newrowhousingCrime = newrowhousingCrime + \
