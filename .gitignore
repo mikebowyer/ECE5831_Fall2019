@@ -1,3 +1,4 @@
 datasets/hous*
 00_Env/venv
 .vscode/settings.json
+datasets/*.csv

@@ -40,11 +40,11 @@
             "console": "integratedTerminal",
             "args": [
                 "-i",
-                "${workspaceFolder}\\datasets\\trainingData1_subset.csv",
+                "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
                 "-pm",
-                "4",
+                "6",
                 "-fm",
-                "2"
+                "3"
             ]
         }
     ]
