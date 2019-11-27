@@ -36,8 +36,8 @@ parser = argparse.ArgumentParser(
     description='this script does what?.')
 parser.add_argument('--input', '-i', type=str, required=True,
                     help='and input training dataset')
-parser.add_argument('--output', '-o', default='output.csv',
-                    help='The output file name where the output data to be used for trianing/evaluating a network is saved.')
+parser.add_argument('--output', '-o', required=True,
+                    help='The name of the model to be saved')
 parser.add_argument('--prev_months', '-pm', required=True,
                     help='How many months in the past should be used for training the model')
 parser.add_argument('--future_months', '-fm', required=True,
@@ -92,14 +92,16 @@ if __name__ == "__main__":
     callbacks_list = [checkpoint]
 
     """ Train Model """
-    myModel.fit(trainingDf, targetDf, epochs=50, batch_size=32,
+    myModel.fit(trainingDf, targetDf, epochs=5, batch_size=32,
                 validation_split=0.2, callbacks=callbacks_list)
 
-    """ Reload model """
-    weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
-    myModel.load_weights(weights_file)  # load it
-    myModel.compile(loss='mean_absolute_error',
-                    optimizer='adam', metrics=['mean_absolute_error'])
+    """ Save Model """
+    myModel.save(args.output+".hdf5")
+    # """ Reload model """
+    # weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
+    # myModel.load_weights(weights_file)  # load it
+    # myModel.compile(loss='mean_absolute_error',
+    #                 optimizer='adam', metrics=['mean_absolute_error'])
 
-    predictions = myModel.predict(trainingDf)
-    print(predictions)
+    # predictions = myModel.predict(trainingDf)
+    # print(predictions)

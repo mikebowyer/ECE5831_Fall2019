@@ -59,7 +59,20 @@
                 "-pm",
                 "4",
                 "-fm",
-                "2"
+                "2",
+                "--output",
+                "simpleFirstModelTest"
+            ]
+        },
+        {
+            "name": "Reload Model",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\03_Model_Evaluation\\reloadModel.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "${workspaceFolder}\\experiments\\simpleFirstModelTest.hdf5"
             ]
         }
     ]
