@@ -36,12 +36,36 @@ parser = argparse.ArgumentParser(
     description='this script does what?.')
 parser.add_argument('--input', '-i', type=str, required=True,
                     help='and input training dataset')
-parser.add_argument('--output', '-o', required=True,
+parser.add_argument('--output_model_name', '-o', required=True,
                     help='The name of the model to be saved')
 parser.add_argument('--prev_months', '-pm', required=True,
                     help='How many months in the past should be used for training the model')
 parser.add_argument('--future_months', '-fm', required=True,
                     help='How many months in the future to predict (1=Only predict current month, and no future months)')
+
+
+def create_training_df(inputDf):
+    cols = inputDf.shape[1]
+    currentZHVIColNum = inputDf.columns.get_loc("ZHVI_t0")
+
+    trainingDf = inputDf.copy()
+
+    trainingDf.drop(
+        trainingDf.columns[currentZHVIColNum:cols], inplace=True, axis=1)
+    trainingDf.drop(
+        axis=1, columns=['Date', 'ZillowNeighborhood'], inplace=True)
+    return trainingDf
+
+
+def create_target_df(inputDf):
+    currentZHVIColNum = inputDf.columns.get_loc("ZHVI_t0")
+    targetDf = inputDf.copy()
+
+    targetDf.drop(
+        targetDf.iloc[:, :currentZHVIColNum], inplace=True, axis=1)
+
+    return targetDf
+
 
 if __name__ == "__main__":
     from tensorflow.python.client import device_lib
@@ -55,21 +79,23 @@ if __name__ == "__main__":
                  str(args.prev_months) + ' months of  worth of data, and will contain ZHVI values of the current month and ' +
                  str(int(args.future_months)-1) + ' months in the future.')
 
+    outputDir = os.path.dirname(args.output_model_name)
+    outputModelName = os.path.basename(args.output_model_name)
+    if outputModelName == '':
+        pass
+    else:
+        outputDir = outputDir + '/' + outputModelName
+
+    if not os.path.exists(outputDir):
+        os.mkdir(outputDir)
+    logging.info(
+        "Output model will be saved to following folder: " + outputDir)
+
+    """ Read in input data """
     inputDf = pd.read_csv(args.input)
 
-    cols = inputDf.shape[1]
-    currentZHVIColNum = inputDf.columns.get_loc("ZHVI_t0")
-
-    trainingDf = inputDf.copy()
-    targetDf = inputDf.copy()
-
-    trainingDf.drop(
-        trainingDf.columns[currentZHVIColNum:cols], inplace=True, axis=1)
-    trainingDf.drop(
-        axis=1, columns=['Date', 'ZillowNeighborhood'], inplace=True)
-
-    targetDf.drop(
-        targetDf.iloc[:, :currentZHVIColNum], inplace=True, axis=1)
+    trainingDf = create_training_df(inputDf)
+    targetDf = create_target_df(inputDf)
 
     """ Define Model """
     myModel = Sequential()
@@ -86,7 +112,8 @@ if __name__ == "__main__":
     myModel.summary()
 
     """ Create checkpoints """
-    checkpoint_name = 'Weights-{epoch:03d}--{val_loss:.5f}.hdf5'
+    checkpoint_name = outputDir + \
+        'best_weights.hdf5'  # _experiments/Weights-{epoch:03d}--{val_loss:.5f}.hdf5'
     checkpoint = ModelCheckpoint(
         checkpoint_name, monitor='val_loss', verbose=1, save_best_only=True, mode='auto')
     callbacks_list = [checkpoint]
@@ -96,7 +123,9 @@ if __name__ == "__main__":
                 validation_split=0.2, callbacks=callbacks_list)
 
     """ Save Model """
-    myModel.save(args.output+".hdf5")
+    logging.info(
+        "Saving final model structure and best weights to: " + outputDir)
+    myModel.save(outputDir + "/model_and_best_wieghts.hdf5")
     # """ Reload model """
     # weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
     # myModel.load_weights(weights_file)  # load it
