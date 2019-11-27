@@ -18,7 +18,7 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 from matplotlib import pyplot as plt
-
+import create_train_test_dfs as cttds
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -35,36 +35,13 @@ logging.basicConfig(level=logging.DEBUG, filemode='w',
 parser = argparse.ArgumentParser(
     description='this script does what?.')
 parser.add_argument('--input', '-i', type=str, required=True,
-                    help='and input training dataset')
+                    help='input training dataset with corresponding target values')
 parser.add_argument('--output_model_name', '-o', required=True,
                     help='The name of the model to be saved')
 parser.add_argument('--prev_months', '-pm', required=True,
                     help='How many months in the past should be used for training the model')
 parser.add_argument('--future_months', '-fm', required=True,
                     help='How many months in the future to predict (1=Only predict current month, and no future months)')
-
-
-def create_training_df(inputDf):
-    cols = inputDf.shape[1]
-    currentZHVIColNum = inputDf.columns.get_loc("ZHVI_t0")
-
-    trainingDf = inputDf.copy()
-
-    trainingDf.drop(
-        trainingDf.columns[currentZHVIColNum:cols], inplace=True, axis=1)
-    trainingDf.drop(
-        axis=1, columns=['Date', 'ZillowNeighborhood'], inplace=True)
-    return trainingDf
-
-
-def create_target_df(inputDf):
-    currentZHVIColNum = inputDf.columns.get_loc("ZHVI_t0")
-    targetDf = inputDf.copy()
-
-    targetDf.drop(
-        targetDf.iloc[:, :currentZHVIColNum], inplace=True, axis=1)
-
-    return targetDf
 
 
 if __name__ == "__main__":
@@ -94,8 +71,8 @@ if __name__ == "__main__":
     """ Read in input data """
     inputDf = pd.read_csv(args.input)
 
-    trainingDf = create_training_df(inputDf)
-    targetDf = create_target_df(inputDf)
+    trainingDf = cttds.create_training_df(inputDf)
+    targetDf = cttds.create_target_df(inputDf)
 
     """ Define Model """
     myModel = Sequential()

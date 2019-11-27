@@ -65,14 +65,16 @@
             ]
         },
         {
-            "name": "Reload Model",
+            "name": "Evaluate Model",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}\\03_Model_Evaluation\\reloadModel.py",
             "console": "integratedTerminal",
             "args": [
+                "-m",
+                "${workspaceFolder}\\experiments\\simpleFirstModelTest\\model_and_best_wieghts.hdf5",
                 "-i",
-                "${workspaceFolder}\\experiments\\simpleFirstModelTest\\model_and_best_wieghts.hdf5"
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv"
             ]
         }
     ]

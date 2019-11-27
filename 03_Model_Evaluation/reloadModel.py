@@ -8,6 +8,12 @@
 # notes           :
 # python_version  :Python 3.7.3
 # ==============================================================================
+
+import create_train_test_dfs as cttds
+import warnings
+import numpy as np
+import matplotlib.pyplot as plt
+
 import logging
 import math
 import argparse
@@ -21,12 +27,6 @@ from keras.layers import Dense, Activation, Flatten
 from matplotlib import pyplot as plt
 
 
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import warnings
-
-
 """ Setup logging config """
 logging.basicConfig(level=logging.DEBUG, filemode='w',
                     format='%(levelname)s:: %(message)s')  # ,filename='app.log')
@@ -35,8 +35,10 @@ logging.basicConfig(level=logging.DEBUG, filemode='w',
 """ Input Arguments """
 parser = argparse.ArgumentParser(
     description='this script reloads a keras model.')
-parser.add_argument('--input', '-i', type=str, required=True,
+parser.add_argument('--model_to_reload', '-m', type=str, required=True,
                     help='Input file of where model was saved in .hdf5 format')
+parser.add_argument('--input', '-i', type=str, required=True,
+                    help='input training dataset with corresponding target values')
 # parser.add_argument('--output', '-o', required=True,
 #                     help='The name of the model to be saved')
 # parser.add_argument('--prev_months', '-pm', required=True,
@@ -51,10 +53,18 @@ if __name__ == "__main__":
     K.tensorflow_backend._get_available_gpus()
     """ Parse Args """
     args = parser.parse_args()
-    logging.info('Using input model ' + str(args.input))
+    logging.info('Using input file ' + str(args.input))
+    logging.info('Using input model ' + str(args.model_to_reload))
 
-    model = load_model(args.input)
+    """ Load model """
+    model = load_model(args.model_to_reload)
     model.summary()
+
+    """ Read in input data """
+    inputDf = pd.read_csv(args.input)
+
+    trainingDf = cttds.create_training_df(inputDf)
+    targetDf = cttds.create_target_df(inputDf)
 
     # """ Reload model """
     # weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
@@ -62,5 +72,5 @@ if __name__ == "__main__":
     # myModel.compile(loss='mean_absolute_error',
     #                 optimizer='adam', metrics=['mean_absolute_error'])
 
-    # predictions = myModel.predict(trainingDf)
-    # print(predictions)
+    predictions = model.predict(trainingDf)
+    print(predictions)
