@@ -56,12 +56,15 @@
             "args": [
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv",
-                "-pm",
-                "4",
-                "-fm",
-                "2",
+                // "-pm",
+                // "4",
+                // "-fm",
+                // "2",
                 "--output_model_name",
-                "experiments\\simpleFirstModelTest"
+                "experiments\\simpleFirstModelTest",
+                "-gpu",
+                "--epochs",
+                "6"
             ]
         },
         {
@@ -74,7 +77,8 @@
                 "-m",
                 "${workspaceFolder}\\experiments\\simpleFirstModelTest\\model_and_best_wieghts.hdf5",
                 "-i",
-                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv"
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv",
+                "-gpu"
             ]
         }
     ]

@@ -19,17 +19,14 @@ from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
 from matplotlib import pyplot as plt
 import create_train_test_dfs as cttds
+from tensorflow.python.client import device_lib
+from keras import backend as K
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import warnings
 
-
-""" Setup logging config """
-logging.basicConfig(level=logging.DEBUG, filemode='w',
-                    format='%(levelname)s:: %(message)s')  # ,filename='app.log')
-# logging.debug('This is a debug message')
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
@@ -38,24 +35,21 @@ parser.add_argument('--input', '-i', type=str, required=True,
                     help='input training dataset with corresponding target values')
 parser.add_argument('--output_model_name', '-o', required=True,
                     help='The name of the model to be saved')
-parser.add_argument('--prev_months', '-pm', required=True,
-                    help='How many months in the past should be used for training the model')
-parser.add_argument('--future_months', '-fm', required=True,
-                    help='How many months in the future to predict (1=Only predict current month, and no future months)')
-
+# parser.add_argument('--prev_months', '-pm', required=True,
+#                     help='How many months in the past should be used for training the model')
+# parser.add_argument('--future_months', '-fm', required=True,
+#                     help='How many months in the future to predict (1=Only predict current month, and no future months)')
+parser.add_argument('--use_gpu', '-gpu', action='store_true',
+                    help='Use this argument when you would like to use GPU.')
+parser.add_argument('--epochs', '-e', default=5,
+                    help='However many epochs you would like to train for.')
 
 if __name__ == "__main__":
-    from tensorflow.python.client import device_lib
-    print(device_lib.list_local_devices())
-    from keras import backend as K
-    K.tensorflow_backend._get_available_gpus()
+
     """ Parse Args """
     args = parser.parse_args()
-    logging.info('Using input file ' + str(args.input))
-    logging.info('Each row in the output file will contain ' +
-                 str(args.prev_months) + ' months of  worth of data, and will contain ZHVI values of the current month and ' +
-                 str(int(args.future_months)-1) + ' months in the future.')
 
+    """ determine output directory/file formats """
     outputDir = os.path.dirname(args.output_model_name)
     outputModelName = os.path.basename(args.output_model_name)
     if outputModelName == '':
@@ -65,16 +59,38 @@ if __name__ == "__main__":
 
     if not os.path.exists(outputDir):
         os.mkdir(outputDir)
+
+    """ Setup logging config """
+    output_log = outputDir + '/training.log'
+    logging.basicConfig(level=logging.DEBUG, filemode='w',
+                        format='%(levelname)s:: %(message)s', filename=output_log)
+    logging.getLogger('matplotlib.font_manager').disabled = True
+    logging.info('Using input training/target data file ' + str(args.input))
+    logging.info('Number of training epochs selected: ' + str(args.epochs))
+    # logging.info('Each row in the output file will contain ' +
+    #              str(args.prev_months) + ' months of  worth of data, and will contain ZHVI values of the current month and ' +
+    #              str(int(args.future_months)-1) + ' months in the future.')
     logging.info(
         "Output model will be saved to following folder: " + outputDir)
 
+    """ determine if user wants to use GPU """
+    if(args.use_gpu):
+        GPU_info = K.tensorflow_backend._get_available_gpus()
+        logging.info('Using GPU with following information: ' + str(GPU_info))
+    else:
+        logging.info('Using CPU instead of GPU')
+
     """ Read in input data """
+    logging.info(
+        'Reading in input data and creating training and target values from ' + str(args.input))
     inputDf = pd.read_csv(args.input)
 
     trainingDf = cttds.create_training_df(inputDf)
     targetDf = cttds.create_target_df(inputDf)
 
     """ Define Model """
+    logging.info(
+        'Model is now being defined and will be summarized below:')
     myModel = Sequential()
     myModel.add(Dense(trainingDf.shape[1], kernel_initializer='normal',
                       input_dim=trainingDf.shape[1], activation='relu'))
@@ -86,7 +102,11 @@ if __name__ == "__main__":
         Dense(2, kernel_initializer='normal', activation='linear'))
     myModel.compile(loss='mean_absolute_error', optimizer='adam',
                     metrics=['mean_absolute_error'])
-    myModel.summary()
+
+    stringlist = []
+    myModel.summary(print_fn=lambda x: stringlist.append(x))
+    short_model_summary = "\n".join(stringlist)
+    logging.info(short_model_summary)
 
     """ Create checkpoints """
     checkpoint_name = outputDir + \
@@ -96,18 +116,23 @@ if __name__ == "__main__":
     callbacks_list = [checkpoint]
 
     """ Train Model """
-    myModel.fit(trainingDf, targetDf, epochs=5, batch_size=32,
-                validation_split=0.2, callbacks=callbacks_list)
+    logging.info(
+        'Beginnging to traing model with ' + str(args.epochs) + ' epochs.')
+    history = myModel.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=32,
+                          validation_split=0.2, callbacks=callbacks_list)
 
     """ Save Model """
     logging.info(
         "Saving final model structure and best weights to: " + outputDir)
     myModel.save(outputDir + "/model_and_best_wieghts.hdf5")
-    # """ Reload model """
-    # weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
-    # myModel.load_weights(weights_file)  # load it
-    # myModel.compile(loss='mean_absolute_error',
-    #                 optimizer='adam', metrics=['mean_absolute_error'])
 
-    # predictions = myModel.predict(trainingDf)
-    # print(predictions)
+    """ Print evaluation scoring metrics and save it """
+    plt.figure(figsize=(20.0, 15.0))
+    plt.plot(history.history['mean_absolute_error'])
+    plt.scatter(range(0, int(args.epochs)),
+                history.history['mean_absolute_error'])
+    plt.title(outputDir + ' Validation Error Verus Training Epoch')
+    plt.xlabel('Training Epoch Number')
+    plt.ylabel('Validation Mean Absolute Error')
+    plt.savefig(outputDir + '/ValidationScoreVersusEpoch.png')
+    plt.show()
