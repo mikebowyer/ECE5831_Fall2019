@@ -71,7 +71,7 @@
             "name": "Evaluate Model",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\03_Model_Evaluation\\reloadModel.py",
+            "program": "${workspaceFolder}\\03_Model_Evaluation\\inference.py",
             "console": "integratedTerminal",
             "args": [
                 "-m",

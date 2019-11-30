@@ -64,19 +64,46 @@ if __name__ == "__main__":
         logging.info('Using CPU instead of GPU')
 
     """ Load model """
+    logging.info(
+        'Loading model from ' + str(args.model_to_reload) + ' With summary:')
     model = load_model(args.model_to_reload)
     model.summary()
+    stringlist = []
+    model.summary(print_fn=lambda x: stringlist.append(x))
+    short_model_summary = "\n".join(stringlist)
+    logging.info(short_model_summary)
 
     """ Read in input data """
+    logging.info(
+        'Reading in input data and creating training and target values from ' + str(args.input))
     inputDf = pd.read_csv(args.input)
     trainingDf = cttds.create_training_df(inputDf)
     targetDf = cttds.create_target_df(inputDf)
 
-    # """ Reload model """
-    # weights_file = 'Weights-046--800.24624.hdf5'  # choose the best checkpoint
-    # myModel.load_weights(weights_file)  # load it
-    # myModel.compile(loss='mean_absolute_error',
-    #                 optimizer='adam', metrics=['mean_absolute_error'])
-
+    """ Predict all training examples """
+    logging.info(
+        'Generating Prediction for all training examples')
     predictions = model.predict(trainingDf)
-    print(predictions)
+    predictionDf = pd.DataFrame(predictions)
+    # print(predictions)
+    numFuturePredictions = targetDf.shape[1]
+    print(numFuturePredictions)
+
+    """ Create Data frame with Target values and predicted values """
+    logging.info(
+        'Combining predictions with target values')
+    evaluationDf = inputDf[['Date', 'ZillowNeighborhood']]
+    for i in range(0, numFuturePredictions):
+        predStr = 'pred_ZHVI_t' + str(i)
+        targStr = 'ZHVI_t' + str(i)
+        evaluationDf[predStr] = predictionDf.iloc[:, i]
+        evaluationDf[targStr] = targetDf.iloc[:, i]
+        # print(predictionDf.iloc[:, i])
+        # print(targetDf.iloc[:, i])
+    print(evaluationDf.head())
+
+    """ Save infered information"""
+    outputFilename = args.model_to_reload + '_inferenceAndTarget.csv'
+    evaluationDf.to_csv(
+        outputFilename, index=None, header=True)
+    logging.info("Saving inferences to " + outputFilename)
