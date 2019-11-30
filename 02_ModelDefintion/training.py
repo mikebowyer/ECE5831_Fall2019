@@ -21,6 +21,7 @@ from matplotlib import pyplot as plt
 import create_train_test_dfs as cttds
 from tensorflow.python.client import device_lib
 from keras import backend as K
+import Models.ConeModel.coneModel as Cone
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -91,20 +92,12 @@ if __name__ == "__main__":
     """ Define Model """
     logging.info(
         'Model is now being defined and will be summarized below:')
-    myModel = Sequential()
-    myModel.add(Dense(trainingDf.shape[1], kernel_initializer='normal',
-                      input_dim=trainingDf.shape[1], activation='relu'))
-    myModel.add(
-        Dense(math.ceil(trainingDf.shape[1]/2), kernel_initializer='normal', activation='relu'))
-    myModel.add(
-        Dense(math.ceil(trainingDf.shape[1]/4), kernel_initializer='normal', activation='relu'))
-    myModel.add(
-        Dense(2, kernel_initializer='normal', activation='linear'))
-    myModel.compile(loss='mean_absolute_error', optimizer='adam',
-                    metrics=['mean_absolute_error'])
+    model = Cone.generateModel(trainingDf.shape)
+    model.compile(loss='mean_absolute_error', optimizer='adam',
+                  metrics=['mean_absolute_error'])
 
     stringlist = []
-    myModel.summary(print_fn=lambda x: stringlist.append(x))
+    model.summary(print_fn=lambda x: stringlist.append(x))
     short_model_summary = "\n".join(stringlist)
     logging.info(short_model_summary)
 
@@ -118,13 +111,13 @@ if __name__ == "__main__":
     """ Train Model """
     logging.info(
         'Beginnging to traing model with ' + str(args.epochs) + ' epochs.')
-    history = myModel.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=32,
-                          validation_split=0.2, callbacks=callbacks_list)
+    history = model.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=32,
+                        validation_split=0.2, callbacks=callbacks_list)
 
     """ Save Model """
     logging.info(
         "Saving final model structure and best weights to: " + outputDir)
-    myModel.save(outputDir + "/model_and_best_wieghts.hdf5")
+    model.save(outputDir + "/model_and_best_wieghts.hdf5")
 
     """ Print evaluation scoring metrics and save it """
     plt.figure(figsize=(20.0, 15.0))

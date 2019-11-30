@@ -51,7 +51,7 @@
             "name": "Train Model",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\02_ModelDefintion\\simpleNet.py",
+            "program": "${workspaceFolder}\\02_ModelDefintion\\training.py",
             "console": "integratedTerminal",
             "args": [
                 "-i",
@@ -61,10 +61,10 @@
                 // "-fm",
                 // "2",
                 "--output_model_name",
-                "experiments\\simpleFirstModelTest",
+                "experiments\\ConeModel",
                 "-gpu",
                 "--epochs",
-                "6"
+                "3"
             ]
         },
         {
