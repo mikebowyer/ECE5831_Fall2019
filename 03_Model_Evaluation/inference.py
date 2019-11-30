@@ -96,11 +96,16 @@ if __name__ == "__main__":
     for i in range(0, numFuturePredictions):
         predStr = 'pred_ZHVI_t' + str(i)
         targStr = 'ZHVI_t' + str(i)
+        MAE = 'MAE_t' + str(i)
+        MAPE = 'MAPE_t' + str(i)
         evaluationDf[predStr] = predictionDf.iloc[:, i]
         evaluationDf[targStr] = targetDf.iloc[:, i]
+        evaluationDf[MAE] = abs(evaluationDf[predStr] - evaluationDf[targStr])
+        evaluationDf[MAPE] = abs(
+            (evaluationDf[predStr] - evaluationDf[targStr])/evaluationDf[targStr])
         # print(predictionDf.iloc[:, i])
         # print(targetDf.iloc[:, i])
-    print(evaluationDf.head())
+    print(evaluationDf.describe())
 
     """ Save infered information"""
     outputFilename = args.model_to_reload + '_inferenceAndTarget.csv'
