@@ -105,6 +105,7 @@ if __name__ == "__main__":
             (evaluationDf[predStr] - evaluationDf[targStr])/evaluationDf[targStr])
         # print(predictionDf.iloc[:, i])
         # print(targetDf.iloc[:, i])
+
     print(evaluationDf.describe())
 
     """ Save infered information"""
@@ -112,3 +113,35 @@ if __name__ == "__main__":
     evaluationDf.to_csv(
         outputFilename, index=None, header=True)
     logging.info("Saving inferences to " + outputFilename)
+
+    """ Generate Error Metrics for overall Training data """
+    EvalCols = evaluationDf.columns.values
+    MAECols = [col for col in EvalCols if 'MAE' in col]
+    MAPECols = [col for col in EvalCols if 'MAPE' in col]
+
+    MAEMean = []
+    MAEStd = []
+    for MAECol in MAECols:
+        MAEMean.append(evaluationDf[MAECol].mean())
+        MAEStd.append(evaluationDf[MAECol].std())
+
+    MAPEMean = []
+    MAPEStd = []
+    for MAPECol in MAPECols:
+        MAPEMean.append(evaluationDf[MAPECol].mean())
+        MAPEStd.append(evaluationDf[MAPECol].std())
+
+    plt.subplot(121)
+    plt.errorbar(MAECols, MAEMean, MAEStd, capsize=15,
+                 capthick=3, barsabove=True, linestyle='None')
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Error')
+    plt.title('Overall Training Mean Asolute Error Mean and Standard Deviations')
+    plt.subplot(122)
+    plt.errorbar(MAPECols, MAPEMean, MAPEStd, capsize=15,
+                 capthick=3, barsabove=True, linestyle='None')
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Percentage Error')
+    plt.title(
+        'Overall Training Mean Asolute Percentage Error Mean and Standard Deviations')
+    plt.show()
