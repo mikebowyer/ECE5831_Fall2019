@@ -145,3 +145,17 @@ if __name__ == "__main__":
     plt.title(
         'Overall Training Mean Asolute Percentage Error Mean and Standard Deviations')
     plt.show()
+
+    # """ Find Errors Per Neighborhoods """
+    # neighborhoods = list(evaluationDf['ZillowNeighborhood'].unique())
+    # for neighborhood in neighborhoods:
+    #     neighborhoodDF = evaluationDf[evaluationDf['ZillowNeighborhood']
+    #                                   == neighborhood]
+    #     MAPEMean = []
+    #     MAPEStd = []
+    #     for MAPECol in MAPECols:
+    #         MAPEMean.append(neighborhoodDF[MAPECol].mean())
+    #         MAPEStd.append(evaluationDf[MAPECol].std())
+    #     print(MAPEMean)
+    #     print(MAEMean)
+    # # plt.scatter(Albany['Date'],Albany['ZHVI_t0'])

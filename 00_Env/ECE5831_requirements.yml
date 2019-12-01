@@ -21,7 +21,7 @@ dependencies:
   - mkl_fft=1.0.15=py37h14836fe_0
   - mkl_random=1.1.0=py37h675688f_0
   - multiprocess=0.70.9=py37hfa6e2cd_0
-  - numpy-base=1.17.3=py37hc3f5095_0
+  - numpy-base=1.16.4=py37hc3f5095_0
   - openssl=1.1.1d=he774522_3
   - pandas=0.25.2=py37ha925a31_0
   - pip=19.2.3=py37_0
