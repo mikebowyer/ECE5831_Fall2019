@@ -92,7 +92,7 @@ if __name__ == "__main__":
     """ Define Model """
     logging.info(
         'Model is now being defined and will be summarized below:')
-    model = Cone.generateModel(trainingDf.shape)
+    model = Cone.generateModel(trainingDf.shape, targetDf.shape)
     model.compile(loss='mean_absolute_error', optimizer='adam',
                   metrics=['mean_absolute_error'])
 

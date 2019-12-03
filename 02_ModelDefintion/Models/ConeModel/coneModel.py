@@ -14,7 +14,7 @@ from keras.layers import Dense, Activation, Flatten
 import numpy as np
 
 
-def generateModel(inputTrainingShape):
+def generateModel(inputTrainingShape, inputTargetShape):
     model = Sequential()
     model.add(Dense(inputTrainingShape[1], kernel_initializer='normal',
                     input_dim=inputTrainingShape[1], activation='relu'))
@@ -23,6 +23,6 @@ def generateModel(inputTrainingShape):
     model.add(
         Dense(math.ceil(inputTrainingShape[1]/4), kernel_initializer='normal', activation='relu'))
     model.add(
-        Dense(2, kernel_initializer='normal', activation='linear'))
+        Dense(inputTargetShape[1], kernel_initializer='normal', activation='linear'))
 
     return model

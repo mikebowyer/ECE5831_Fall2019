@@ -42,9 +42,9 @@
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
                 "-pm",
-                "6",
+                "24",
                 "-fm",
-                "3"
+                "12"
             ]
         },
         {
@@ -55,16 +55,16 @@
             "console": "integratedTerminal",
             "args": [
                 "-i",
-                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv",
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
                 // "-pm",
                 // "4",
                 // "-fm",
                 // "2",
                 "--output_model_name",
-                "experiments\\ConeModel",
+                "experiments\\ConeModel24Months",
                 "-gpu",
                 "--epochs",
-                "3"
+                "100"
             ]
         },
         {
@@ -75,9 +75,9 @@
             "console": "integratedTerminal",
             "args": [
                 "-m",
-                "${workspaceFolder}\\experiments\\simpleFirstModelTest\\model_and_best_wieghts.hdf5",
+                "${workspaceFolder}\\experiments\\ConeModel24Months\\model_and_best_wieghts.hdf5",
                 "-i",
-                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_4Prev_2Future_Months.csv",
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
                 "-gpu"
             ]
         }
