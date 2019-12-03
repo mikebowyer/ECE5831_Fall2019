@@ -42,9 +42,43 @@
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
                 "-pm",
-                "6",
+                "24",
                 "-fm",
-                "3"
+                "12"
+            ]
+        },
+        {
+            "name": "Train Model",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\02_ModelDefintion\\training.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-i",
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                // "-pm",
+                // "4",
+                // "-fm",
+                // "2",
+                "--output_model_name",
+                "experiments\\ConeModel24MonthsWithLinearDropout",
+                "-gpu",
+                "--epochs",
+                "100"
+            ]
+        },
+        {
+            "name": "Evaluate Model",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\03_Model_Evaluation\\inference_and_eval.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-m",
+                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\model_and_best_wieghts.hdf5",
+                "-i",
+                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                "-gpu"
             ]
         }
     ]
