@@ -19,6 +19,7 @@ import math
 import argparse
 import os
 import pandas as pd
+import tensorflow as tf
 
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
@@ -29,9 +30,10 @@ from tensorflow.python.client import device_lib
 from keras import backend as K
 
 """ Setup logging config """
-logging.basicConfig(level=logging.DEBUG, filemode='w',
-                    format='%(levelname)s:: %(message)s')  # ,filename='app.log')
-# logging.debug('This is a debug message')
+log = logging.basicConfig(level=logging.INFO, filemode='w',
+                          format='%(levelname)s:: %(message)s')  # ,filename='app.log')
+log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
@@ -62,12 +64,13 @@ if __name__ == "__main__":
         logging.info('Using GPU with following information: ' + str(GPU_info))
     else:
         logging.info('Using CPU instead of GPU')
+    tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
     """ Load model """
     logging.info(
         'Loading model from ' + str(args.model_to_reload) + ' With summary:')
     model = load_model(args.model_to_reload)
-    model.summary()
+
     stringlist = []
     model.summary(print_fn=lambda x: stringlist.append(x))
     short_model_summary = "\n".join(stringlist)
