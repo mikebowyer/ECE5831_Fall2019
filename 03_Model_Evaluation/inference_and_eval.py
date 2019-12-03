@@ -88,26 +88,30 @@ if __name__ == "__main__":
         'Generating Prediction for all training examples')
     predictions = model.predict(trainingDf)
     predictionDf = pd.DataFrame(predictions)
-    # print(predictions)
     numFuturePredictions = targetDf.shape[1]
-    print(numFuturePredictions)
 
     """ Create Data frame with Target values and predicted values """
     logging.info(
         'Combining predictions with target values')
     evaluationDf = inputDf[['Date', 'ZillowNeighborhood']]
     for i in range(0, numFuturePredictions):
+        """ Create new strings for new column headers """
         predStr = 'pred_ZHVI_t' + str(i)
         targStr = 'ZHVI_t' + str(i)
         MAE = 'MAE_t' + str(i)
         MAPE = 'MAPE_t' + str(i)
-        evaluationDf[predStr] = predictionDf.iloc[:, i]
-        evaluationDf[targStr] = targetDf.iloc[:, i]
+
+        """ Generate predicted and target data in form of dict """
+        newColumnsDict = {}
+        newColumnsDict[predStr] = list(predictionDf.iloc[:, i].values)
+        newColumnsDict[targStr] = list(targetDf.iloc[:, i].values)
+        newColDf = pd.DataFrame(newColumnsDict)
+        evaluationDf = pd.concat([evaluationDf, newColDf], axis=1)
+
+        """ Add in evaluation metrics columns """
         evaluationDf[MAE] = abs(evaluationDf[predStr] - evaluationDf[targStr])
         evaluationDf[MAPE] = abs(
             (evaluationDf[predStr] - evaluationDf[targStr])/evaluationDf[targStr])
-        # print(predictionDf.iloc[:, i])
-        # print(targetDf.iloc[:, i])
 
     print(evaluationDf.describe())
 
