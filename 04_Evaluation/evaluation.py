@@ -13,6 +13,7 @@ import argparse
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 """ Setup logging config """
 log = logging.basicConfig(level=logging.INFO, filemode='w',
@@ -107,6 +108,9 @@ if __name__ == "__main__":
     neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
     Dates = list(inferredDf['Date'].unique())
     xticksDates = [date for date in Dates if '-01' in date]
+    inferredCols = inferredDf.columns.values
+    predZHVICOls = [col for col in inferredCols if 'pred_ZHVI_t' in col]
+
     for neighborhood in neighborhoods:
         neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
                                     == neighborhood]
@@ -119,19 +123,27 @@ if __name__ == "__main__":
         scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", alpha=0.5, marker=r'$\clubsuit$',
                               label="Actual ZHVI")
         plt.xticks(xticksDates)
-        # plt.scatter(mynewDf['Date'], mynewDf['pred_ZHVI_t0'], c="g", alpha=0.5, marker=r'+',
-        # label = "Actual ZHVI")
+
+        print(len(mynewDf['ZHVI_t0']))
+        for futureMonthNumber, predictionColName in enumerate(predZHVICOls, start=0):
+            values = neighborhoodDF[predictionColName].values
+            # add appropriate number of Nones to start of list
+            print(type(values))
+            for i in range(0, futureMonthNumber):
+                values = np.insert(values, 0, None)
+            # chop off values which are predicting future dates which we don't have
+            values = values[:len(values)-futureMonthNumber]
+            print(len(values))
+
+            plt.scatter(mynewDf['Date'], values,
+                        c="g", alpha=0.5, marker=r'+', label="Actual ZHVI")
+
         plt.xlabel("Date")
         plt.ylabel("Zillow Home Value Index")
         plt.title(
             "Zillow Home Value Index and Predictions for the Neighborhood: " + neighborhood)
-        plt.legend(loc='upper left')
+        plt.legend(loc='best')
         plt.show()
-
-        # Cols = [col for col in EvalCols if 'AbsErr' in col]
-        # MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
-
-        break
 
     """ Find Errors Per Neighborhoods """
     # neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
