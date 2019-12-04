@@ -105,6 +105,8 @@ if __name__ == "__main__":
 
     """ Plot all ZHVI predictions for One Neighborhood """
     neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
+    Dates = list(inferredDf['Date'].unique())
+    xticksDates = [date for date in Dates if '-01' in date]
     for neighborhood in neighborhoods:
         neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
                                     == neighborhood]
@@ -114,12 +116,15 @@ if __name__ == "__main__":
         mynewDf = neighborhoodDF[[
             'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
 
-        plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", alpha=0.5, marker=r'$\clubsuit$',
-                    label="Actual ZHVI")
-        plt.scatter(mynewDf['Date'], mynewDf['pred_ZHVI_t0'], c="g", alpha=0.5, marker=r'+',
-                    label="Actual ZHVI")
-        plt.xlabel("Leprechauns")
-        plt.ylabel("Gold")
+        scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", alpha=0.5, marker=r'$\clubsuit$',
+                              label="Actual ZHVI")
+        plt.xticks(xticksDates)
+        # plt.scatter(mynewDf['Date'], mynewDf['pred_ZHVI_t0'], c="g", alpha=0.5, marker=r'+',
+        # label = "Actual ZHVI")
+        plt.xlabel("Date")
+        plt.ylabel("Zillow Home Value Index")
+        plt.title(
+            "Zillow Home Value Index and Predictions for the Neighborhood: " + neighborhood)
         plt.legend(loc='upper left')
         plt.show()
 
