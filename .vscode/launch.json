@@ -87,15 +87,12 @@
             "name": "Evalution",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\03_inference\\inference.py",
+            "program": "${workspaceFolder}\\04_Evaluation\\evaluation.py",
             "console": "integratedTerminal",
             "args": [
-                "-m",
-                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\model_and_best_wieghts.hdf5",
-                "-i",
-                // "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
-                "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
-                "-gpu"
+                "--inference_data",
+                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                // "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv"
             ]
         }
     ]
