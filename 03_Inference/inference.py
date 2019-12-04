@@ -1,32 +1,21 @@
 #!/usr/bin/env python
-# title           :reloadModel.py
+# title           : inference.py
 # description     :
-# author          :Michael Bowyer
-# date            :20191126
-# version         :0.0
-# usage           :
-# notes           :
+# author          : Michael Bowyer
+# date            : 20191126
+# version         : 0.0
+# usage           : This script reloads a trained keras model, and runs inference (prediction) on the input data.
 # python_version  :Python 3.7.3
 # ==============================================================================
 
-import create_train_test_dfs as cttds
-import warnings
-import numpy as np
-import matplotlib.pyplot as plt
-
 import logging
-import math
 import argparse
 import os
 import pandas as pd
-import tensorflow as tf
 
-from keras.callbacks import ModelCheckpoint
+import create_train_test_dfs as cttds
+import tensorflow as tf
 from keras.models import load_model
-from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten
-from matplotlib import pyplot as plt
-from tensorflow.python.client import device_lib
 from keras import backend as K
 
 """ Setup logging config """
@@ -37,19 +26,13 @@ log.setLevel(logging.DEBUG)
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
-    description='this script reloads a keras model.')
+    description='This script reloads a trained keras model, and runs inference (prediction) on the input data. ')
 parser.add_argument('--model_to_reload', '-m', type=str, required=True,
                     help='Input file of where model was saved in .hdf5 format')
 parser.add_argument('--input', '-i', type=str, required=True,
                     help='input training dataset with corresponding target values')
 parser.add_argument('--use_gpu', '-gpu', action='store_true',
                     help='Use this argument when you would like to use GPU.')
-# parser.add_argument('--output', '-o', required=True,
-#                     help='The name of the model to be saved')
-# parser.add_argument('--prev_months', '-pm', required=True,
-#                     help='How many months in the past should be used for training the model')
-# parser.add_argument('--future_months', '-fm', required=True,
-#                     help='How many months in the future to predict (1=Only predict current month, and no future months)')
 
 if __name__ == "__main__":
 
@@ -78,19 +61,19 @@ if __name__ == "__main__":
 
     """ Read in input data """
     logging.info(
-        'Reading in input data and creating training and target values from ' + str(args.input))
+        'Reading in input data and creating input feature vectors and target value vectors from ' + str(args.input))
     inputDf = pd.read_csv(args.input)
     trainingDf = cttds.create_training_df(inputDf)
     targetDf = cttds.create_target_df(inputDf)
 
-    """ Predict all training examples """
+    """ Predict all input feature examples """
     logging.info(
-        'Generating Prediction for all training examples')
+        'Generating Prediction for input feature examples')
     predictions = model.predict(trainingDf)
     predictionDf = pd.DataFrame(predictions)
     numFuturePredictions = targetDf.shape[1]
 
-    """ Create Data frame with Target values and predicted values """
+    """ Create Data frame with Target + predicted values, Absolute Error, and Percentage Error """
     logging.info(
         'Combining predictions with target values')
     evaluationDf = inputDf[['Date', 'ZillowNeighborhood']]
@@ -98,8 +81,8 @@ if __name__ == "__main__":
         """ Create new strings for new column headers """
         predStr = 'pred_ZHVI_t' + str(i)
         targStr = 'ZHVI_t' + str(i)
-        MAE = 'MAE_t' + str(i)
-        MAPE = 'MAPE_t' + str(i)
+        AbsErr = 'AbsErr_t' + str(i)
+        AbsPercentErr = 'AbsPercentErr_t' + str(i)
 
         """ Generate predicted and target data in form of dict """
         newColumnsDict = {}
@@ -109,14 +92,13 @@ if __name__ == "__main__":
         evaluationDf = pd.concat([evaluationDf, newColDf], axis=1)
 
         """ Add in evaluation metrics columns """
-        evaluationDf[MAE] = abs(evaluationDf[predStr] - evaluationDf[targStr])
-        evaluationDf[MAPE] = abs(
+        evaluationDf[AbsErr] = abs(
+            evaluationDf[predStr] - evaluationDf[targStr])
+        evaluationDf[AbsPercentErr] = abs(
             (evaluationDf[predStr] - evaluationDf[targStr])/evaluationDf[targStr])
-
-    print(evaluationDf.describe())
 
     """ Save infered information"""
     outputFilename = args.model_to_reload + '_inferenceAndTarget.csv'
+    logging.info("Saving inferences to " + outputFilename)
     evaluationDf.to_csv(
         outputFilename, index=None, header=True)
-    logging.info("Saving inferences to " + outputFilename)

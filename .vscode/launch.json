@@ -68,10 +68,10 @@
             ]
         },
         {
-            "name": "Evaluate Model",
+            "name": "Inference",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\03_Model_Evaluation\\inference_and_eval.py",
+            "program": "${workspaceFolder}\\03_inference\\inference.py",
             "console": "integratedTerminal",
             "args": [
                 "-m",
