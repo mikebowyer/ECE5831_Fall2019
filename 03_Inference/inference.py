@@ -98,7 +98,15 @@ if __name__ == "__main__":
             (evaluationDf[predStr] - evaluationDf[targStr])/evaluationDf[targStr])
 
     """ Save infered information"""
-    outputFilename = args.model_to_reload + '_inferenceAndTarget.csv'
-    logging.info("Saving inferences to " + outputFilename)
+    outputdir = os.path.split(args.model_to_reload)[0]
+    inputDir, inputFile = os.path.split(args.input)
+    inputFileBase = os.path.splitext(inputFile)[0]
+    outputdir = outputdir + '\\predictions\\'
+    if not os.path.exists(outputdir):
+        os.mkdir(outputdir)
+    outputFilename = outputdir + \
+        inputFileBase + '_PredictedAndTarget_ZHVI.csv'
+
+    logging.info("Saving predicted and target values to " + outputFilename)
     evaluationDf.to_csv(
         outputFilename, index=None, header=True)
