@@ -13,7 +13,7 @@ import argparse
 import os
 import pandas as pd
 
-import create_train_test_dfs as cttds
+import create_train_target_dfs as cttds
 import tensorflow as tf
 from keras.models import load_model
 from keras import backend as K
