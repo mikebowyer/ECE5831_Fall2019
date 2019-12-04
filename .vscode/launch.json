@@ -93,6 +93,8 @@
                 "--inference_data",
                 "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
                 // "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv"
+                "--output_dir",
+                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout",
             ]
         }
     ]
