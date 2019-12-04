@@ -41,6 +41,7 @@
             "args": [
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
+                // "${workspaceFolder}\\datasets\\Test\\TestData.csv",
                 "-pm",
                 "24",
                 "-fm",
@@ -64,7 +65,7 @@
                 "experiments\\ConeModel24MonthsWithLinearDropout",
                 "-gpu",
                 "--epochs",
-                "100"
+                "10"
             ]
         },
         {
@@ -77,7 +78,23 @@
                 "-m",
                 "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\model_and_best_wieghts.hdf5",
                 "-i",
-                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                // "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
+                "-gpu"
+            ]
+        },
+        {
+            "name": "Evalution",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\03_inference\\inference.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-m",
+                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\model_and_best_wieghts.hdf5",
+                "-i",
+                // "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
                 "-gpu"
             ]
         }
