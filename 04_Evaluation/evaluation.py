@@ -54,7 +54,7 @@ if __name__ == "__main__":
     inferredDf = pd.read_csv(args.inference_data)
 
     """ Generate Plots for MAE and MAPE for entire inferred set """
-    generatePlots = True
+    generatePlots = False
     if(generatePlots):
         """ Generate Error Metrics for overall Training data """
         EvalCols = inferredDf.columns.values
@@ -103,16 +103,42 @@ if __name__ == "__main__":
         else:
             plt.show()
 
-# """ Find Errors Per Neighborhoods """
-# neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
-# for neighborhood in neighborhoods:
-#     neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
-#                                   == neighborhood]
-#     MAPEMean = []
-#     MAPEStd = []
-#     for MAPECol in MAPECols:
-#         MAPEMean.append(neighborhoodDF[MAPECol].mean())
-#         MAPEStd.append(inferredDf[MAPECol].std())
-#     print(MAPEMean)
-#     print(MAEMean)
-# # plt.scatter(Albany['Date'],Albany['ZHVI_t0'])
+    """ Plot all ZHVI predictions for One Neighborhood """
+    neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
+    for neighborhood in neighborhoods:
+        neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
+                                    == neighborhood]
+
+        inferredCols = inferredDf.columns.values
+
+        mynewDf = neighborhoodDF[[
+            'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
+
+        plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", alpha=0.5, marker=r'$\clubsuit$',
+                    label="Actual ZHVI")
+        plt.scatter(mynewDf['Date'], mynewDf['pred_ZHVI_t0'], c="g", alpha=0.5, marker=r'+',
+                    label="Actual ZHVI")
+        plt.xlabel("Leprechauns")
+        plt.ylabel("Gold")
+        plt.legend(loc='upper left')
+        plt.show()
+
+        # Cols = [col for col in EvalCols if 'AbsErr' in col]
+        # MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
+
+        break
+
+    """ Find Errors Per Neighborhoods """
+    # neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
+    # for neighborhood in neighborhoods:
+    #     neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
+    #                                 == neighborhood]
+    #     MAPEMean = []
+    #     MAPEStd = []
+    #     for MAPECol in MAPECols:
+    #         MAPEMean.append(neighborhoodDF[MAPECol].mean())
+    #         MAPEStd.append(inferredDf[MAPECol].std())
+    #     print(MAPEMean)
+    #     print(MAEMean)
+    #     break
+    # # plt.scatter(Albany['Date'],Albany['ZHVI_t0'])
