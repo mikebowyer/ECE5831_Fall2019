@@ -46,7 +46,7 @@ class PastFutureDataGenerator:
             # print("i = " + str(i))
             """ Create new headings for housingCrime Data """
             tempHeadings = []
-            timeStep = '_t-' + str(i+1)  # create time step string
+            timeStep = '_t-' + str(i)  # create time step string
             # for each feature name add times step value to it
             tempHeadings = tempHeadings + [s + timeStep for s in allHeadings]
             # add all feature values to ZHVI and crime data for this timestep

@@ -3,3 +3,4 @@ datasets/hous*
 .vscode/settings.json
 datasets/*.csv
 /experiments
+*.pyc
