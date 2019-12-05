@@ -13,7 +13,10 @@ import argparse
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib
 import numpy as np
+from datetime import datetime
 
 """ Setup logging config """
 log = logging.basicConfig(level=logging.INFO, filemode='w',
@@ -31,6 +34,8 @@ parser.add_argument('--output_dir', '-o', type=str, default='',
 
 if __name__ == "__main__":
 
+    """ Turn off matplot lib output """
+    matplotlib.set_loglevel("warning")
     """ Parse Args """
     args = parser.parse_args()
     logging.info('Using input inferece file to generate metrics: ' +
@@ -120,29 +125,37 @@ if __name__ == "__main__":
         mynewDf = neighborhoodDF[[
             'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
 
-        scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", alpha=0.5, marker=r'$\clubsuit$',
+        scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", marker="d",
                               label="Actual ZHVI")
         plt.xticks(xticksDates)
 
-        print(len(mynewDf['ZHVI_t0']))
+        # print(len(mynewDf['ZHVI_t0']))
+        colors = cm.rainbow(np.linspace(0, 1, len(predZHVICOls)))
+
         for futureMonthNumber, predictionColName in enumerate(predZHVICOls, start=0):
             values = neighborhoodDF[predictionColName].values
             # add appropriate number of Nones to start of list
             print(type(values))
             for i in range(0, futureMonthNumber):
-                values = np.insert(values, 0, None)
+                values = np.insert(values, 0, np.nan)
             # chop off values which are predicting future dates which we don't have
             values = values[:len(values)-futureMonthNumber]
-            print(len(values))
 
+            legendStr = 'Predicted ZHVI ' + \
+                str(futureMonthNumber) + " Months Ago"
             plt.scatter(mynewDf['Date'], values,
-                        c="g", alpha=0.5, marker=r'+', label="Actual ZHVI")
+                        c=[colors[futureMonthNumber]], marker="1", label=legendStr)
 
         plt.xlabel("Date")
         plt.ylabel("Zillow Home Value Index")
         plt.title(
             "Zillow Home Value Index and Predictions for the Neighborhood: " + neighborhood)
         plt.legend(loc='best')
+        plt.minorticks_on()
+        # Customize the major grid
+        plt.grid(which='major', linestyle='-', color='black')
+        # Customize the minor grid
+        plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.show()
 
     """ Find Errors Per Neighborhoods """
