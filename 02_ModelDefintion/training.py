@@ -111,8 +111,11 @@ if __name__ == "__main__":
     """ Train Model """
     logging.info(
         'Beginnging to traing model with ' + str(args.epochs) + ' epochs.')
-    history = model.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=32,
-                        validation_split=0.2, callbacks=callbacks_list)
+    # Batch size is number of entries per neighborhood
+    # There are 93 Neighborhoods in trianing data, each with 190 Months of data
+    # holding out 9 for valdidation (~10%) is equal to ~18.38709% of the dataset.
+    history = model.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=190,
+                        validation_split=18.38709, callbacks=callbacks_list)
 
     """ Save Model """
     logging.info(

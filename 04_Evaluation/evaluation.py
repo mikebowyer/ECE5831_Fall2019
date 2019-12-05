@@ -60,7 +60,7 @@ if __name__ == "__main__":
     inferredDf = pd.read_csv(args.inference_data)
 
     """ Generate Plots for MAE and MAPE for entire inferred set """
-    generatePlots = False
+    generatePlots = True
     if(generatePlots):
         """ Generate Error Metrics for overall Training data """
         EvalCols = inferredDf.columns.values
@@ -124,7 +124,7 @@ if __name__ == "__main__":
 
         mynewDf = neighborhoodDF[[
             'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
-
+        plt.figure(3, figsize=(15.0, 10.0))
         scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", marker="d",
                               label="Actual ZHVI")
         plt.xticks(xticksDates)
