@@ -80,8 +80,21 @@ if __name__ == "__main__":
 
         """ Create Plots for Mean Absolute Error """
         plt.figure(1, figsize=(15.0, 10.0))
-        plt.errorbar(MAECols, MAEMean, MAEStd, capsize=15,
-                     capthick=3, barsabove=True, linestyle='None')
+        plt.grid
+        # plt.errorbar(MAECols, MAEMean, MAEStd, marker='s', mfc='red',
+        #              mec='green', ms=20, mew=4)
+        inferredVals = inferredDf[MAECols].values
+        bplot = plt.boxplot(inferredVals, showfliers=False,
+                            showmeans=True, patch_artist=True)
+        colors = cm.rainbow(np.linspace(.5, 1, 12))
+        # colors = ['cyan', 'lightblue', 'lightgreen', 'tan', 'pink']
+        for patch, color in zip(bplot['boxes'], colors):
+            patch.set_facecolor(color)
+        plt.minorticks_on()
+        # Customize the major grid
+        plt.grid(which='major', linestyle='-', color='black')
+        # Customize the minor grid
+        plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
         plt.xlabel('Predicted Months (tx, with x=number of months in future)')
         plt.ylabel('Mean Absolute Error')
         plt.title(
