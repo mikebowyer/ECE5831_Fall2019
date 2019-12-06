@@ -66,7 +66,7 @@ if __name__ == "__main__":
     MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
 
     """ Create Plots for Mean Absolute Error """
-    plt.figure(1, figsize=(15.0, 10.0))
+    plt.figure(1)  # , figsize=(15.0, 10.0))
     plt.grid
     inferredVals = inferredDf[MAECols].values
     bplot = plt.boxplot(inferredVals, showfliers=False,
@@ -87,7 +87,6 @@ if __name__ == "__main__":
     plt.ylabel('Mean Absolute Error')
     plt.title(
         'Overall Mean Absolute Error and Standard Deviations')
-
     # Save Graphs or View them?
     if saveImages:
         MAE_Image = outputdir + \
@@ -97,7 +96,7 @@ if __name__ == "__main__":
         plt.show()
 
     """ Create Plots for Mean Absolute Percentage Error """
-    plt.figure(2, figsize=(15.0, 10.0))
+    plt.figure(2)  # figsize=(15.0, 10.0))
     plt.grid
     inferredVals = inferredDf[MAPECols].values
     bplot = plt.boxplot(inferredVals, showfliers=False,
@@ -142,7 +141,7 @@ if __name__ == "__main__":
 
         mynewDf = neighborhoodDF[[
             'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
-        plt.figure(figsize=(15.0, 10.0))
+        plt.figure(figsize=(16.0, 8))
         scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", marker="d",
                               label="Actual ZHVI")
         plt.xticks(xticksDates)
@@ -168,7 +167,7 @@ if __name__ == "__main__":
         plt.ylabel("Zillow Home Value Index")
         plt.title(
             "Zillow Home Value Index and Predictions for the Neighborhood: " + neighborhood)
-        plt.legend(loc='best')
+        plt.legend(loc='upper right')
         plt.minorticks_on()
         # Customize the major grid
         plt.grid(which='major', linestyle='-', color='black')
@@ -176,9 +175,10 @@ if __name__ == "__main__":
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
 
         if saveImages:
-            neighborhoodImageName = outputdir + \
-                '\\' + neighborhood + '_PredictedZHVIOverTime.png'
-            plt.savefig(neighborhoodImageName)
+            if neighborhood == 'Schorsch Village':
+                neighborhoodImageName = outputdir + \
+                    '\\' + neighborhood + '_PredictedZHVIOverTime.png'
+                plt.savefig(neighborhoodImageName)
             break
         else:
             plt.show()

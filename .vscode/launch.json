@@ -62,11 +62,11 @@
                 // "-fm",
                 // "2",
                 "--output_model_name",
-                "experiments\\Dec4thConeModel1000EpochRelu",
+                "experiments\\Dec5",
                 // "experiments\\ConeModel24MonthsWithLinearDropout",
                 "-gpu",
                 "--epochs",
-                "500"
+                "100"
             ]
         },
         {
@@ -77,10 +77,10 @@
             "console": "integratedTerminal",
             "args": [
                 "-m",
-                "${workspaceFolder}\\experiments\\Dec4thConeModel1000EpochRelu\\model_and_best_wieghts.hdf5",
+                "${workspaceFolder}\\experiments\\Dec5\\model_and_best_wieghts.hdf5",
                 "-i",
-                "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
-                // "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
+                // "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
+                "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
                 "-gpu"
             ]
         },
@@ -93,10 +93,11 @@
             "args": [
                 "--inference_data",
                 // "${workspaceFolder}\\experiments\\Dec4thConeModel1000EpochRelu\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
-                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                // "${workspaceFolder}\\experiments\\Dec5\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                "${workspaceFolder}\\experiments\\Dec5\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
                 // "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv"
-                // "--output_dir",
-                // "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout",
+                "--output_dir",
+                "${workspaceFolder}\\experiments\\Dec5",
             ]
         }
     ]
