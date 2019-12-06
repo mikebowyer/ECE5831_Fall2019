@@ -40,7 +40,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     logging.info('Using input inferece file to generate metrics: ' +
                  str(args.inference_data))
-    outputdir = ''
+    saveImages = False
     if not (args.output_dir == ''):
         inputDir, inputFile = os.path.split(args.inference_data)
         inputFileBase = os.path.splitext(inputFile)[0]
@@ -52,6 +52,7 @@ if __name__ == "__main__":
             os.mkdir(outputdir)
         logging.info('Saving all evaluation images and data to: ' +
                      str(outputdir))
+        saveImages = True
     else:
         logging.info(
             'Output directory not set, so not saving any output evaluation images or data')
@@ -59,68 +60,72 @@ if __name__ == "__main__":
     """ Loading in infered dataset """
     inferredDf = pd.read_csv(args.inference_data)
 
-    """ Generate Plots for MAE and MAPE for entire inferred set """
-    generatePlots = True
-    if(generatePlots):
-        """ Generate Error Metrics for overall Training data """
-        EvalCols = inferredDf.columns.values
-        MAECols = [col for col in EvalCols if 'AbsErr' in col]
-        MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
+    """ Grab Column names  """
+    EvalCols = inferredDf.columns.values
+    MAECols = [col for col in EvalCols if 'AbsErr' in col]
+    MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
 
-        MAEMean = []
-        MAEStd = []
-        for MAECol in MAECols:
-            MAEMean.append(inferredDf[MAECol].mean())
-            MAEStd.append(inferredDf[MAECol].std())
-        MAPEMean = []
-        MAPEStd = []
-        for MAPECol in MAPECols:
-            MAPEMean.append(inferredDf[MAPECol].mean())
-            MAPEStd.append(inferredDf[MAPECol].std())
+    """ Create Plots for Mean Absolute Error """
+    plt.figure(1, figsize=(15.0, 10.0))
+    plt.grid
+    inferredVals = inferredDf[MAECols].values
+    bplot = plt.boxplot(inferredVals, showfliers=False,
+                        showmeans=True, patch_artist=True)
+    # Create colors for all boxes, and lines.
+    colors = cm.rainbow(np.linspace(.5, 1, 12))
+    for patch, color in zip(bplot['boxes'], colors):
+        patch.set_facecolor(color)
+    for whisker, cap in zip(bplot['whiskers'], bplot['caps']):
+        whisker.set(color='b', lw=2)
+        cap.set(color='b', lw=2)
+    # Setting Grib Info
+    plt.minorticks_on()
+    plt.grid(which='major', linestyle='-', color='black')
+    plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+    # Set Graph Texts
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Error')
+    plt.title(
+        'Overall Mean Absolute Error and Standard Deviations')
 
-        """ Create Plots for Mean Absolute Error """
-        plt.figure(1, figsize=(15.0, 10.0))
-        plt.grid
-        # plt.errorbar(MAECols, MAEMean, MAEStd, marker='s', mfc='red',
-        #              mec='green', ms=20, mew=4)
-        inferredVals = inferredDf[MAECols].values
-        bplot = plt.boxplot(inferredVals, showfliers=False,
-                            showmeans=True, patch_artist=True)
-        colors = cm.rainbow(np.linspace(.5, 1, 12))
-        # colors = ['cyan', 'lightblue', 'lightgreen', 'tan', 'pink']
-        for patch, color in zip(bplot['boxes'], colors):
-            patch.set_facecolor(color)
-        plt.minorticks_on()
-        # Customize the major grid
-        plt.grid(which='major', linestyle='-', color='black')
-        # Customize the minor grid
-        plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-        plt.xlabel('Predicted Months (tx, with x=number of months in future)')
-        plt.ylabel('Mean Absolute Error')
-        plt.title(
-            'Overall Mean Absolute Error and Standard Deviations')
-        if not (args.output_dir == ''):
-            MAE_Image = outputdir + \
-                '\\Overall_Mean_Absolute_Error_and_Standard_Deviations.png'
-            plt.savefig(MAE_Image)
-        else:
-            plt.show()
+    # Save Graphs or View them?
+    if saveImages:
+        MAE_Image = outputdir + \
+            '\\Overall_Mean_Absolute_Error_and_Standard_Deviations.png'
+        plt.savefig(MAE_Image)
+    else:
+        plt.show()
 
-        """ Create Plots for Mean Absolute Percentage Error """
-        plt.figure(2, figsize=(15.0, 10.0))
-        plt.errorbar(MAPECols, MAPEMean, MAPEStd, capsize=15,
-                     capthick=3, barsabove=True, linestyle='None')
-        plt.xlabel('Predicted Months (tx, with x=number of months in future)')
-        plt.ylabel('Mean Absolute Percentage Error')
-        plt.title(
-            'Overall Mean Absolute Percentage Error and Standard Deviations')
+    """ Create Plots for Mean Absolute Percentage Error """
+    plt.figure(2, figsize=(15.0, 10.0))
+    plt.grid
+    inferredVals = inferredDf[MAPECols].values
+    bplot = plt.boxplot(inferredVals, showfliers=False,
+                        showmeans=True, patch_artist=True)
+    # Create colors for all boxes, and lines.
+    colors = cm.rainbow(np.linspace(.5, 1, 12))
+    for patch, color in zip(bplot['boxes'], colors):
+        patch.set_facecolor(color)
+    for whisker, cap in zip(bplot['whiskers'], bplot['caps']):
+        whisker.set(color='b', lw=2)
+        cap.set(color='b', lw=2)
+    # Setting Grib Info
+    plt.minorticks_on()
+    plt.grid(which='major', linestyle='-', color='black')
+    plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+    # Set Graph Texts
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Percentage Error')
+    plt.title(
+        'Overall Mean Absolute Percentage Error and Standard Deviations')
 
-        if not (args.output_dir == ''):
-            MAPE_Image = outputdir + \
-                '\\Overall_Mean_Absolute_Percentage_Error_and_Standard_Deviations.png'
-            plt.savefig(MAPE_Image)
-        else:
-            plt.show()
+    # Save Graphs or View them?
+    if saveImages:
+        MAE_Image = outputdir + \
+            '\\Overall_Mean_Absolute_Percentage_Error_and_Standard_Deviations.png'
+        plt.savefig(MAE_Image)
+    else:
+        plt.show()
 
     """ Plot all ZHVI predictions for One Neighborhood """
     neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
@@ -137,7 +142,7 @@ if __name__ == "__main__":
 
         mynewDf = neighborhoodDF[[
             'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
-        plt.figure(3, figsize=(15.0, 10.0))
+        plt.figure(figsize=(15.0, 10.0))
         scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", marker="d",
                               label="Actual ZHVI")
         plt.xticks(xticksDates)
@@ -169,7 +174,14 @@ if __name__ == "__main__":
         plt.grid(which='major', linestyle='-', color='black')
         # Customize the minor grid
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
-        plt.show()
+
+        if saveImages:
+            neighborhoodImageName = outputdir + \
+                '\\' + neighborhood + '_PredictedZHVIOverTime.png'
+            plt.savefig(neighborhoodImageName)
+            break
+        else:
+            plt.show()
 
     """ Find Errors Per Neighborhoods """
     # neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
