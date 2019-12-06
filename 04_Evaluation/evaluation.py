@@ -182,18 +182,24 @@ if __name__ == "__main__":
             break
         else:
             plt.show()
+            break
 
     """ Find Errors Per Neighborhoods """
-    # neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
-    # for neighborhood in neighborhoods:
-    #     neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
-    #                                 == neighborhood]
-    #     MAPEMean = []
-    #     MAPEStd = []
-    #     for MAPECol in MAPECols:
-    #         MAPEMean.append(neighborhoodDF[MAPECol].mean())
-    #         MAPEStd.append(inferredDf[MAPECol].std())
-    #     print(MAPEMean)
-    #     print(MAEMean)
-    #     break
-    # # plt.scatter(Albany['Date'],Albany['ZHVI_t0'])
+    neighborhoods = list(sorted(inferredDf['ZillowNeighborhood'].unique()))
+    col = list(inferredDf.drop(['Date', 'ZillowNeighborhood'], axis=1))
+
+    ErrCols = [col for col in col if 'AbsErr_' in col]
+
+    newdf = pd.DataFrame()
+    newdf['ZillowNeighborhood'] = neighborhoods
+
+    cnt = 0
+    for col in ErrCols:
+        meanerrdf = inferredDf.groupby('ZillowNeighborhood', as_index=False)[col].mean()
+        stddevdf = pd.DataFrame(inferredDf.groupby('ZillowNeighborhood', as_index=True)[col].std())
+        newdf['MeanAbsErr_t' + str(cnt)] = meanerrdf[col]
+        newdf['STDEVAbsErr_t' + str(cnt)] = stddevdf[col].values
+        cnt+=1
+
+    newdf.to_csv('Evaluation_Per_Neighborhood.csv', index = False)
+    #files.download('Chicago_Housing_Crime_Combined_Final.csv')   
