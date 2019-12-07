@@ -29,7 +29,7 @@ import Models.ConeModel.coneModel as Cone
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
-    description='this script does what?.')
+    description='This script trains a specified model on the specified input data')
 parser.add_argument('--input', '-i', type=str, required=True,
                     help='input training dataset with corresponding target values')
 parser.add_argument('--output_model_name', '-o', required=True,
@@ -94,6 +94,7 @@ if __name__ == "__main__":
     logging.info(
         'Model is now being defined and will be summarized below:')
     model = Cone.generateModel(trainingDf.shape, targetDf.shape)
+    # model = XmasTree.generateModel(trainingDf.shape, targetDf.shape)
     model.compile(loss='mean_absolute_error', optimizer='adam',
                   metrics=['mean_absolute_error'])
 
