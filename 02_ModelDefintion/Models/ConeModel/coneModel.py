@@ -19,7 +19,7 @@ def generateModel(inputTrainingShape, inputTargetShape):
 
     model.add(Dense(inputTrainingShape[1], kernel_initializer='normal',
                     input_dim=inputTrainingShape[1], activation='linear'))
-    # model.add(Dropout(0.2, input_shape=(inputTrainingShape[1],)))
+    model.add(Dropout(0.1, input_shape=(inputTrainingShape[1],)))
     model.add(
         Dense(math.ceil(inputTrainingShape[1]*2), kernel_initializer='normal', activation='linear'))
     # model.add(Dropout(0.2))
