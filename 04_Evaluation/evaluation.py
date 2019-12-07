@@ -31,6 +31,8 @@ parser.add_argument('--inference_data', '-id', type=str, required=True,
                     help='Input csv file which contains infered and error data from some ZHVI dataset')
 parser.add_argument('--output_dir', '-o', type=str, default='',
                     help='Output directory where output graphs and evaluations will be stored')
+parser.add_argument('--neighborhood_plot_to_save', '-np', type=str, default='Schorsch Village',
+                    help='The name of the neighborhood which the image of the predicted values plot shall be saved')
 
 if __name__ == "__main__":
 
@@ -92,6 +94,7 @@ if __name__ == "__main__":
         MAE_Image = outputdir + \
             '\\Overall_Mean_Absolute_Error_and_Standard_Deviations.png'
         plt.savefig(MAE_Image)
+        logging.info('Saving Mean Absolute Error Image to: ' + MAE_Image)
     else:
         plt.show()
 
@@ -120,9 +123,11 @@ if __name__ == "__main__":
 
     # Save Graphs or View them?
     if saveImages:
-        MAE_Image = outputdir + \
+        MAPE_Image = outputdir + \
             '\\Overall_Mean_Absolute_Percentage_Error_and_Standard_Deviations.png'
-        plt.savefig(MAE_Image)
+        plt.savefig(MAPE_Image)
+        logging.info(
+            'Saving Mean Absolute Percentage Error Image to: ' + MAPE_Image)
     else:
         plt.show()
 
@@ -133,7 +138,11 @@ if __name__ == "__main__":
     inferredCols = inferredDf.columns.values
     predZHVICOls = [col for col in inferredCols if 'pred_ZHVI_t' in col]
 
+    if saveImages:
+        neighborhoods = [args.neighborhood_plot_to_save]
+
     for neighborhood in neighborhoods:
+
         neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
                                     == neighborhood]
 
@@ -175,14 +184,15 @@ if __name__ == "__main__":
         plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
 
         if saveImages:
-            if neighborhood == 'Schorsch Village':
-                neighborhoodImageName = outputdir + \
-                    '\\' + neighborhood + '_PredictedZHVIOverTime.png'
-                plt.savefig(neighborhoodImageName)
-                break
+
+            neighborhoodImageName = outputdir + \
+                '\\' + neighborhood + '_PredictedZHVIOverTime.png'
+            logging.info(
+                'Saving ZHVI and Predictions for the Neighborhood: ' + neighborhood)
+            plt.savefig(neighborhoodImageName)
+            break
         else:
             plt.show()
-            # break
 
     """ Find Errors Per Neighborhoods """
     neighborhoods = list(sorted(inferredDf['ZillowNeighborhood'].unique()))
@@ -205,4 +215,6 @@ if __name__ == "__main__":
 
     evalPerNeighborhoodDir = outputdir + \
         '\\Evaluation_Per_Neighborhood.csv'
+    logging.info(
+        'Saving Per Neighborhood Metrics to: ' + evalPerNeighborhoodDir)
     newdf.to_csv(evalPerNeighborhoodDir, index=False)
