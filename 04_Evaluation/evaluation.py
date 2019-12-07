@@ -179,10 +179,10 @@ if __name__ == "__main__":
                 neighborhoodImageName = outputdir + \
                     '\\' + neighborhood + '_PredictedZHVIOverTime.png'
                 plt.savefig(neighborhoodImageName)
-            break
+                break
         else:
             plt.show()
-            break
+            # break
 
     """ Find Errors Per Neighborhoods """
     neighborhoods = list(sorted(inferredDf['ZillowNeighborhood'].unique()))
@@ -195,11 +195,14 @@ if __name__ == "__main__":
 
     cnt = 0
     for col in ErrCols:
-        meanerrdf = inferredDf.groupby('ZillowNeighborhood', as_index=False)[col].mean()
-        stddevdf = pd.DataFrame(inferredDf.groupby('ZillowNeighborhood', as_index=True)[col].std())
+        meanerrdf = inferredDf.groupby(
+            'ZillowNeighborhood', as_index=False)[col].mean()
+        stddevdf = pd.DataFrame(inferredDf.groupby(
+            'ZillowNeighborhood', as_index=True)[col].std())
         newdf['MeanAbsErr_t' + str(cnt)] = meanerrdf[col]
         newdf['STDEVAbsErr_t' + str(cnt)] = stddevdf[col].values
-        cnt+=1
+        cnt += 1
 
-    newdf.to_csv('Evaluation_Per_Neighborhood.csv', index = False)
-    #files.download('Chicago_Housing_Crime_Combined_Final.csv')   
+    evalPerNeighborhoodDir = outputdir + \
+        '\\Evaluation_Per_Neighborhood.csv'
+    newdf.to_csv(evalPerNeighborhoodDir, index=False)
