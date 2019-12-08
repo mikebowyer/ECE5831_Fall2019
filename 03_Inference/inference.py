@@ -69,6 +69,7 @@ if __name__ == "__main__":
     """ Predict all input feature examples """
     logging.info(
         'Generating Prediction for input feature examples')
+    trainArray = trainingDf.to_numpy()
     predictions = model.predict(trainingDf)
     predictionDf = pd.DataFrame(predictions)
     numFuturePredictions = targetDf.shape[1]

@@ -29,7 +29,7 @@ import Models.ConeModel.coneModel as Cone
 
 """ Input Arguments """
 parser = argparse.ArgumentParser(
-    description='this script does what?.')
+    description='This script trains a specified model on the specified input data')
 parser.add_argument('--input', '-i', type=str, required=True,
                     help='input training dataset with corresponding target values')
 parser.add_argument('--output_model_name', '-o', required=True,
@@ -94,6 +94,7 @@ if __name__ == "__main__":
     logging.info(
         'Model is now being defined and will be summarized below:')
     model = Cone.generateModel(trainingDf.shape, targetDf.shape)
+    # model = XmasTree.generateModel(trainingDf.shape, targetDf.shape)
     model.compile(loss='mean_absolute_error', optimizer='adam',
                   metrics=['mean_absolute_error'])
 
@@ -111,8 +112,13 @@ if __name__ == "__main__":
     """ Train Model """
     logging.info(
         'Beginnging to traing model with ' + str(args.epochs) + ' epochs.')
-    history = model.fit(trainingDf, targetDf, epochs=int(args.epochs), batch_size=32,
-                        validation_split=0.2, callbacks=callbacks_list)
+    # Batch size is number of entries per neighborhood
+    # There are 93 Neighborhoods in trianing data, each with 190 Months of data
+    # holding out 9 for valdidation (~10%) is equal to ~18.38709% of the dataset.
+    trainArray = trainingDf.to_numpy()
+    targetArray = targetDf.to_numpy()
+    history = model.fit(trainArray, targetArray, epochs=int(args.epochs), batch_size=190,
+                        validation_split=18.38709, callbacks=callbacks_list)
 
     """ Save Model """
     logging.info(

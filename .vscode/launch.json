@@ -32,7 +32,7 @@
                 "ChicagoTrimmedHousingData_transformed_2001AndBeyond.csv"
             ]
         },
-        {
+        { // DNN_Data_Creator
             "name": "DNN_Data_Creator",
             "type": "python",
             "request": "launch",
@@ -41,14 +41,14 @@
             "args": [
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData.csv",
-                // "${workspaceFolder}\\datasets\\Test\\TestData.csv",
-                "-pm",
+                //"${workspaceFolder}\\datasets\\Test\\TestData.csv",
+                "--prev_months",
                 "24",
-                "-fm",
+                "--future_months",
                 "12"
             ]
         },
-        {
+        { // Train Model
             "name": "Train Model",
             "type": "python",
             "request": "launch",
@@ -57,18 +57,15 @@
             "args": [
                 "-i",
                 "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
-                // "-pm",
-                // "4",
-                // "-fm",
-                // "2",
                 "--output_model_name",
-                "experiments\\ConeModel24MonthsWithLinearDropout",
+                // "experiments\\Dec5",
+                "experiments\\Dec7thDemoDryRun",
                 "-gpu",
                 "--epochs",
                 "10"
             ]
         },
-        {
+        { // Inference
             "name": "Inference",
             "type": "python",
             "request": "launch",
@@ -76,14 +73,14 @@
             "console": "integratedTerminal",
             "args": [
                 "-m",
-                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\model_and_best_wieghts.hdf5",
+                "${workspaceFolder}\\experiments\\Dec7thDemoDryRun\\model_and_best_wieghts.hdf5",
                 "-i",
                 // "${workspaceFolder}\\datasets\\Train\\TrainData_housingCrime_24Prev_12Future_Months.csv",
                 "${workspaceFolder}\\datasets\\Test\\TestData_housingCrime_24Prev_12Future_Months.csv",
                 "-gpu"
             ]
         },
-        {
+        { // Evaluation
             "name": "Evalution",
             "type": "python",
             "request": "launch",
@@ -91,10 +88,15 @@
             "console": "integratedTerminal",
             "args": [
                 "--inference_data",
-                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                // "${workspaceFolder}\\experiments\\Dec4thConeModel1000EpochRelu\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                // "${workspaceFolder}\\experiments\\Dec5\\predictions\\TrainData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                // "${workspaceFolder}\\experiments\\Dec5\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
+                "${workspaceFolder}\\experiments\\Dec7thDemoDryRun\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv",
                 // "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout\\predictions\\TestData_housingCrime_24Prev_12Future_Months_PredictedAndTarget_ZHVI.csv"
-                "--output_dir",
-                "${workspaceFolder}\\experiments\\ConeModel24MonthsWithLinearDropout",
+                // "--output_dir",
+                // "${workspaceFolder}\\experiments\\Dec7thDemoDryRun",
+                "--neighborhood_plot_to_save",
+                "Schorsch Village"
             ]
         }
     ]

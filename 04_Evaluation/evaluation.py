@@ -13,6 +13,10 @@ import argparse
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+import matplotlib
+import numpy as np
+from datetime import datetime
 
 """ Setup logging config """
 log = logging.basicConfig(level=logging.INFO, filemode='w',
@@ -27,14 +31,18 @@ parser.add_argument('--inference_data', '-id', type=str, required=True,
                     help='Input csv file which contains infered and error data from some ZHVI dataset')
 parser.add_argument('--output_dir', '-o', type=str, default='',
                     help='Output directory where output graphs and evaluations will be stored')
+parser.add_argument('--neighborhood_plot_to_save', '-np', type=str, default='Schorsch Village',
+                    help='The name of the neighborhood which the image of the predicted values plot shall be saved')
 
 if __name__ == "__main__":
 
+    """ Turn off matplot lib output """
+    matplotlib.set_loglevel("warning")
     """ Parse Args """
     args = parser.parse_args()
     logging.info('Using input inferece file to generate metrics: ' +
                  str(args.inference_data))
-    outputdir = ''
+    saveImages = False
     if not (args.output_dir == ''):
         inputDir, inputFile = os.path.split(args.inference_data)
         inputFileBase = os.path.splitext(inputFile)[0]
@@ -46,6 +54,7 @@ if __name__ == "__main__":
             os.mkdir(outputdir)
         logging.info('Saving all evaluation images and data to: ' +
                      str(outputdir))
+        saveImages = True
     else:
         logging.info(
             'Output directory not set, so not saving any output evaluation images or data')
@@ -53,66 +62,159 @@ if __name__ == "__main__":
     """ Loading in infered dataset """
     inferredDf = pd.read_csv(args.inference_data)
 
-    """ Generate Plots for MAE and MAPE for entire inferred set """
-    generatePlots = True
-    if(generatePlots):
-        """ Generate Error Metrics for overall Training data """
-        EvalCols = inferredDf.columns.values
-        MAECols = [col for col in EvalCols if 'AbsErr' in col]
-        MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
+    """ Grab Column names  """
+    EvalCols = inferredDf.columns.values
+    MAECols = [col for col in EvalCols if 'AbsErr' in col]
+    MAPECols = [col for col in EvalCols if 'AbsPercentErr' in col]
 
-        MAEMean = []
-        MAEStd = []
-        for MAECol in MAECols:
-            MAEMean.append(inferredDf[MAECol].mean())
-            MAEStd.append(inferredDf[MAECol].std())
-        MAPEMean = []
-        MAPEStd = []
-        for MAPECol in MAPECols:
-            MAPEMean.append(inferredDf[MAPECol].mean())
-            MAPEStd.append(inferredDf[MAPECol].std())
+    """ Create Plots for Mean Absolute Error """
+    plt.figure(1)  # , figsize=(15.0, 10.0))
+    plt.grid
+    inferredVals = inferredDf[MAECols].values
+    bplot = plt.boxplot(inferredVals, showfliers=False,
+                        showmeans=True, patch_artist=True)
+    # Create colors for all boxes, and lines.
+    colors = cm.rainbow(np.linspace(.5, 1, 12))
+    for patch, color in zip(bplot['boxes'], colors):
+        patch.set_facecolor(color)
+    for whisker, cap in zip(bplot['whiskers'], bplot['caps']):
+        whisker.set(color='b', lw=2)
+        cap.set(color='b', lw=2)
+    # Setting Grib Info
+    plt.minorticks_on()
+    plt.grid(which='major', linestyle='-', color='black')
+    plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+    # Set Graph Texts
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Error')
+    plt.title(
+        'Overall Mean Absolute Error and Standard Deviations')
+    # Save Graphs or View them?
+    if saveImages:
+        MAE_Image = outputdir + \
+            '\\Overall_Mean_Absolute_Error_and_Standard_Deviations.png'
+        plt.savefig(MAE_Image)
+        logging.info('Saving Mean Absolute Error Image to: ' + MAE_Image)
+    else:
+        plt.show()
 
-        """ Create Plots for Mean Absolute Error """
-        plt.figure(1, figsize=(15.0, 10.0))
-        plt.errorbar(MAECols, MAEMean, MAEStd, capsize=15,
-                     capthick=3, barsabove=True, linestyle='None')
-        plt.xlabel('Predicted Months (tx, with x=number of months in future)')
-        plt.ylabel('Mean Absolute Error')
+    """ Create Plots for Mean Absolute Percentage Error """
+    plt.figure(2)  # figsize=(15.0, 10.0))
+    plt.grid
+    inferredVals = inferredDf[MAPECols].values
+    bplot = plt.boxplot(inferredVals, showfliers=False,
+                        showmeans=True, patch_artist=True)
+    # Create colors for all boxes, and lines.
+    colors = cm.rainbow(np.linspace(.5, 1, 12))
+    for patch, color in zip(bplot['boxes'], colors):
+        patch.set_facecolor(color)
+    for whisker, cap in zip(bplot['whiskers'], bplot['caps']):
+        whisker.set(color='b', lw=2)
+        cap.set(color='b', lw=2)
+    # Setting Grib Info
+    plt.minorticks_on()
+    plt.grid(which='major', linestyle='-', color='black')
+    plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+    # Set Graph Texts
+    plt.xlabel('Predicted Months (tx, with x=number of months in future)')
+    plt.ylabel('Mean Absolute Percentage Error')
+    plt.title(
+        'Overall Mean Absolute Percentage Error and Standard Deviations')
+
+    # Save Graphs or View them?
+    if saveImages:
+        MAPE_Image = outputdir + \
+            '\\Overall_Mean_Absolute_Percentage_Error_and_Standard_Deviations.png'
+        plt.savefig(MAPE_Image)
+        logging.info(
+            'Saving Mean Absolute Percentage Error Image to: ' + MAPE_Image)
+    else:
+        plt.show()
+
+    """ Plot all ZHVI predictions for One Neighborhood """
+    neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
+    Dates = list(inferredDf['Date'].unique())
+    xticksDates = [date for date in Dates if '-01' in date]
+    inferredCols = inferredDf.columns.values
+    predZHVICOls = [col for col in inferredCols if 'pred_ZHVI_t' in col]
+
+    if saveImages:
+        neighborhoods = [args.neighborhood_plot_to_save]
+
+    for neighborhood in neighborhoods:
+
+        neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
+                                    == neighborhood]
+
+        inferredCols = inferredDf.columns.values
+
+        mynewDf = neighborhoodDF[[
+            'Date', 'ZillowNeighborhood', 'ZHVI_t0', 'pred_ZHVI_t0']]
+        plt.figure(figsize=(16.0, 8))
+        scatter = plt.scatter(mynewDf['Date'], mynewDf['ZHVI_t0'], c="g", marker="d",
+                              label="Actual ZHVI")
+        plt.xticks(xticksDates)
+
+        # print(len(mynewDf['ZHVI_t0']))
+        colors = cm.rainbow(np.linspace(0, 1, len(predZHVICOls)))
+
+        for futureMonthNumber, predictionColName in enumerate(predZHVICOls, start=0):
+            values = neighborhoodDF[predictionColName].values
+            # add appropriate number of Nones to start of list
+            print(type(values))
+            for i in range(0, futureMonthNumber):
+                values = np.insert(values, 0, np.nan)
+            # chop off values which are predicting future dates which we don't have
+            values = values[:len(values)-futureMonthNumber]
+
+            legendStr = 'Predicted ZHVI ' + \
+                str(futureMonthNumber) + " Months Ago"
+            plt.scatter(mynewDf['Date'], values,
+                        c=[colors[futureMonthNumber]], marker="1", label=legendStr)
+
+        plt.xlabel("Date")
+        plt.ylabel("Zillow Home Value Index")
         plt.title(
-            'Overall Mean Absolute Error and Standard Deviations')
-        if not (args.output_dir == ''):
-            MAE_Image = outputdir + \
-                '\\Overall_Mean_Absolute_Error_and_Standard_Deviations.png'
-            plt.savefig(MAE_Image)
+            "Zillow Home Value Index and Predictions for the Neighborhood: " + neighborhood)
+        plt.legend(loc='upper right')
+        plt.minorticks_on()
+        # Customize the major grid
+        plt.grid(which='major', linestyle='-', color='black')
+        # Customize the minor grid
+        plt.grid(which='minor', linestyle=':', linewidth='0.5', color='black')
+
+        if saveImages:
+
+            neighborhoodImageName = outputdir + \
+                '\\' + neighborhood + '_PredictedZHVIOverTime.png'
+            logging.info(
+                'Saving ZHVI and Predictions for the Neighborhood: ' + neighborhood)
+            plt.savefig(neighborhoodImageName)
+            break
         else:
             plt.show()
 
-        """ Create Plots for Mean Absolute Percentage Error """
-        plt.figure(2, figsize=(15.0, 10.0))
-        plt.errorbar(MAPECols, MAPEMean, MAPEStd, capsize=15,
-                     capthick=3, barsabove=True, linestyle='None')
-        plt.xlabel('Predicted Months (tx, with x=number of months in future)')
-        plt.ylabel('Mean Absolute Percentage Error')
-        plt.title(
-            'Overall Mean Absolute Percentage Error and Standard Deviations')
+    """ Find Errors Per Neighborhoods """
+    neighborhoods = list(sorted(inferredDf['ZillowNeighborhood'].unique()))
+    col = list(inferredDf.drop(['Date', 'ZillowNeighborhood'], axis=1))
 
-        if not (args.output_dir == ''):
-            MAPE_Image = outputdir + \
-                '\\Overall_Mean_Absolute_Percentage_Error_and_Standard_Deviations.png'
-            plt.savefig(MAPE_Image)
-        else:
-            plt.show()
+    ErrCols = [col for col in col if 'AbsErr_' in col]
 
-# """ Find Errors Per Neighborhoods """
-# neighborhoods = list(inferredDf['ZillowNeighborhood'].unique())
-# for neighborhood in neighborhoods:
-#     neighborhoodDF = inferredDf[inferredDf['ZillowNeighborhood']
-#                                   == neighborhood]
-#     MAPEMean = []
-#     MAPEStd = []
-#     for MAPECol in MAPECols:
-#         MAPEMean.append(neighborhoodDF[MAPECol].mean())
-#         MAPEStd.append(inferredDf[MAPECol].std())
-#     print(MAPEMean)
-#     print(MAEMean)
-# # plt.scatter(Albany['Date'],Albany['ZHVI_t0'])
+    newdf = pd.DataFrame()
+    newdf['ZillowNeighborhood'] = neighborhoods
+
+    cnt = 0
+    for col in ErrCols:
+        meanerrdf = inferredDf.groupby(
+            'ZillowNeighborhood', as_index=False)[col].mean()
+        stddevdf = pd.DataFrame(inferredDf.groupby(
+            'ZillowNeighborhood', as_index=True)[col].std())
+        newdf['MeanAbsErr_t' + str(cnt)] = meanerrdf[col]
+        newdf['STDEVAbsErr_t' + str(cnt)] = stddevdf[col].values
+        cnt += 1
+
+    evalPerNeighborhoodDir = outputdir + \
+        '\\Evaluation_Per_Neighborhood.csv'
+    logging.info(
+        'Saving Per Neighborhood Metrics to: ' + evalPerNeighborhoodDir)
+    newdf.to_csv(evalPerNeighborhoodDir, index=False)
