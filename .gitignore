@@ -4,3 +4,7 @@ datasets/hous*
 datasets/*.csv
 /experiments
 *.pyc
+datasets/Train/*.csv
+!datasets/Train/TrainData.csv
+datasets/Test/*.csv
+!datasets/Test/TrainData.csv
